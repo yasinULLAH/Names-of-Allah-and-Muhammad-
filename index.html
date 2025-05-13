@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Names Challenge</title>
+    <style>
+        :root {
+            --primary-bg: #0a0f1f; /* Deep dark blue */
+            --secondary-bg: #1a2340; /* Slightly lighter dark blue */
+            --accent-color: #00d1ff; /* Divine light blue */
+            --gold-accent: #ffd700; /* Gold for highlights */
+            --text-color: #e0e0e0; /* Light grey for text */
+            --text-color-arabic: #f0f0f0; /* Brighter white for Arabic */
+            --text-color-heading: #ffffff;
+            --border-color: #303f73; /* Bluish border */
+            --button-bg: #007bff;
+            --button-hover-bg: #0056b3;
+            --card-bg: #10182f;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --font-sans-serif: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-arabic: 'Noto Naskh Arabic', 'Times New Roman', serif; /* Noto Naskh Arabic is good for Arabic script */
+        }
+
+        body {
+            font-family: var(--font-sans-serif);
+            margin: 0;
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        header {
+            background-color: var(--secondary-bg);
+            color: var(--text-color-heading);
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            box-shadow: 0 2px 10px rgba(0, 209, 255, 0.3);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        nav {
+            background-color: var(--secondary-bg);
+            padding: 10px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        nav button {
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 0 10px rgba(0, 209, 255, 0.2);
+        }
+
+        nav button:hover, nav button.active {
+            background-color: var(--gold-accent);
+            color: var(--primary-bg);
+            transform: translateY(-2px);
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .screen {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button, input[type="button"], input[type="submit"] {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover, input[type="button"]:hover, input[type="submit"]:hover {
+            background-color: var(--button-hover-bg);
+            box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+        }
+        
+        button.icon-button {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.5em;
+            padding: 5px;
+            cursor: pointer;
+        }
+        button.icon-button:hover {
+            color: var(--gold-accent);
+        }
+
+        .name-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 209, 255, 0.1) inset;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .name-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 209, 255, 0.2) inset;
+        }
+
+        .name-card .arabic-name {
+            font-family: var(--font-arabic);
+            font-size: 2.5em;
+            color: var(--text-color-arabic);
+            text-align: right; /* For Arabic script */
+            margin-bottom: 10px;
+            direction: rtl;
+        }
+        .name-card .transliteration {
+            font-style: italic;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+        .name-card .translation, .name-card .significance {
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+        .name-card .significance {
+            font-size: 0.85em;
+            color: #b0b0b0;
+        }
+        .name-card .actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        /* Game specific styles */
+        .game-options button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+            padding: 15px;
+        }
+        .game-options button.correct {
+            background-color: var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+        .game-options button.incorrect {
+            background-color: var(--error-color);
+            box-shadow: 0 0 10px var(--error-color);
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .memory-card {
+            background-color: var(--secondary-bg);
+            border: 2px solid var(--accent-color);
+            border-radius: 5px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.3s, background-color 0.3s;
+            perspective: 1000px;
+        }
+        .memory-card .card-content {
+            display: none; /* Shown when flipped */
+            font-size: 0.9em;
+            text-align: center;
+            transform: rotateY(180deg);
+        }
+        .memory-card.flipped {
+            background-color: var(--card-bg);
+            transform: rotateY(180deg);
+        }
+        .memory-card.flipped .card-content {
+            display: block;
+        }
+        .memory-card.matched {
+            background-color: var(--success-color);
+            border-color: var(--gold-accent);
+            opacity: 0.7;
+            cursor: default;
+        }
+        .memory-card .arabic-text-small {
+            font-family: var(--font-arabic);
+            font-size: 1.5em;
+        }
+
+        .quiz-question {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            border-left: 5px solid var(--accent-color);
+        }
+
+        /* Settings */
+        .settings-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 5px;
+        }
+        .settings-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent-color);
+        }
+        .settings-group select, .settings-group input[type="number"], .settings-group input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--secondary-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Progress */
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--secondary-bg);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            width: 0%; /* Will be set by JS */
+            height: 20px;
+            background-color: var(--accent-color);
+            border-radius: 5px;
+            text-align: center;
+            line-height: 20px;
+            color: var(--primary-bg);
+            font-weight: bold;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .mt-1 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 1rem; }
+        .arabic-text { font-family: var(--font-arabic); direction: rtl; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.5em; }
+            nav button { padding: 8px 10px; font-size: 0.9em; }
+            main { padding: 15px; }
+            .name-card .arabic-name { font-size: 2em; }
+            button, input[type="button"], input[type="submit"] { padding: 10px 15px; font-size: 0.9em; }
+            .memory-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .memory-card { height: 80px; }
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent-color);
+            color: var(--primary-bg);
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 209, 255, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s, bottom 0.5s;
+            font-weight: bold;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            bottom: 30px;
+        }
+        #toast-notification.error {
+            background-color: var(--error-color);
+            color: white;
+        }
+        #toast-notification.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Beautiful Names Challenge</h1>
+        </header>
+
+        <nav id="main-nav">
+            <button data-screen="home-screen">Home</button>
+            <button data-screen="list-names-screen">List Names</button>
+            <button data-screen="match-game-screen">Match Game</button>
+            <button data-screen="memory-game-screen">Memory Game</button>
+            <button data-screen="quiz-game-screen">Quiz</button>
+            <button data-screen="srs-review-screen">SRS Review</button>
+            <button data-screen="progress-screen">Progress</button>
+            <button data-screen="settings-screen">Settings</button>
+        </nav>
+
+        <main id="main-content">
+            <section id="home-screen" class="screen active">
+                <h2>Welcome to the Beautiful Names Challenge</h2>
+                <p class="text-center">Learn the Asma ul Husna (99 Names of Allah) and Prophet Muhammad's (PBUH) Names.</p>
+                <p class="text-center">Select a mode from the navigation above to begin.</p>
+                <div class="text-center mt-1">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgiIGhlaWdodD0iMTA4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZDcwMCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xMiAyIEwxMiAyMiBNMTIgMiBDIDEwIDIgOSA0IDcgNiBNMTIgMiBDIDE0IDIgMTUgNCAxNyA2Ij48L3BhdGg+PHBhdGggZD0iTTUgOCBDIDcgMTAgMTAgMTEgMTIgMTEgQyAxNCAxMSAxNyAxMCAxOSA4Ij48L3BhdGg+PHBhdGggZD0iTTUgMTIgQyA3IDE0IDEwIDE1IDEyIDE1IEMgMTQgMTUgMTcgMTQgMTkgMTIiPjwvcGF0aD48cGF0aCBkPSJNNSAxNiBDIDcgMTggMTAgMTkgMTIgMTkgQyAxNCAxOSAxNyAxOCAxOSAxNiI+PC9wYXRoPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBzdHJva2U9IiMwMGQxZmYiIHN0cm9rZS13aWR0aD0iMC41Ii8+PC9zdmc+" alt="Decorative Islamic Art" style="opacity:0.7; max-width:100px; margin: 20px auto; display:block;">
+                </div>
+            </section>
+
+            <section id="list-names-screen" class="screen">
+                <h2>List of Names</h2>
+                <div class="button-group">
+                    <label for="listFilterType">Filter by Type:</label>
+                    <select id="listFilterType">
+                        <option value="all">All Names</option>
+                        <option value="allah">Names of Allah</option>
+                        <option value="prophet">Names of Prophet (PBUH)</option>
+                    </select>
+                    <label for="listLanguage">Translation Language:</label>
+                    <select id="listLanguage">
+                        <option value="en">English</option>
+                        <option value="ur">Urdu</option>
+                        <option value="pa">Pashto</option>
+                    </select>
+                </div>
+                <div id="names-list-container"></div>
+            </section>
+
+            <section id="match-game-screen" class="screen">
+                <h2>Match Name to Translation</h2>
+                <div id="match-game-area">
+                    <p class="text-center">Loading game...</p>
+                </div>
+                <div id="match-game-feedback" class="text-center mt-1"></div>
+                <div class="text-center mt-1">
+                    <button id="next-match-question">Next Question</button>
+                </div>
+            </section>
+
+            <section id="memory-game-screen" class="screen">
+                <h2>Memory Game</h2>
+                <p class="text-center">Flip cards to match the Name with its meaning.</p>
+                <div class="button-group">
+                    <label for="memoryGameType">Name Type:</label>
+                    <select id="memoryGameType">
+                        <option value="allah">Names of Allah</option>
+                        <option value="prophet">Names of Prophet (PBUH)</option>
+                    </select>
+                    <label for="memoryPairCount">Pairs:</label>
+                    <select id="memoryPairCount">
+                        <option value="4">4 Pairs (8 cards)</option>
+                        <option value="6">6 Pairs (12 cards)</option>
+                        <option value="8">8 Pairs (16 cards)</option>
+                    </select>
+                    <button id="startMemoryGameBtn">Start Memory Game</button>
+                </div>
+                <div id="memory-grid-container" class="memory-grid"></div>
+                <p id="memory-game-status" class="text-center mt-1"></p>
+            </section>
+
+            <section id="quiz-game-screen" class="screen">
+                <h2>Quiz: Meaning to Name</h2>
+                 <div id="quiz-game-area">
+                    <p class="text-center">Loading quiz...</p>
+                </div>
+                <div id="quiz-game-feedback" class="text-center mt-1"></div>
+                <div class="text-center mt-1">
+                    <button id="next-quiz-question">Next Question</button>
+                </div>
+            </section>
+
+            <section id="srs-review-screen" class="screen">
+                <h2>Spaced Repetition Review</h2>
+                <p class="text-center">Items due for review will appear here.</p>
+                <div id="srs-review-area"></div>
+                 <div class="text-center mt-1">
+                    <button id="srs-show-answer">Show Answer</button>
+                    <button id="srs-correct">Correct</button>
+                    <button id="srs-incorrect">Incorrect</button>
+                </div>
+            </section>
+
+            <section id="progress-screen" class="screen">
+                <h2>Your Progress</h2>
+                <div id="progress-details">
+                    <p>Overall Learning Progress:</p>
+                    <div class="progress-bar-container"><div id="overall-progress-bar" class="progress-bar">0%</div></div>
+                    <p>Names of Allah Mastered: <span id="allah-names-mastered">0</span>/<span id="allah-names-total">0</span></p>
+                    <p>Names of Prophet (PBUH) Mastered: <span id="prophet-names-mastered">0</span>/<span id="prophet-names-total">0</span></p>
+                    <!-- More detailed stats can be added here -->
+                </div>
+            </section>
+
+            <section id="settings-screen" class="screen">
+                <h2>Settings</h2>
+                <div class="settings-group">
+                    <label for="defaultLanguage">Default Translation Language:</label>
+                    <select id="defaultLanguage">
+                        <option value="en">English</option>
+                        <option value="ur">Urdu</option>
+                        <option value="pa">Pashto</option>
+                    </select>
+                </div>
+                <div class="settings-group">
+                    <h3>Quiz Settings</h3>
+                    <label for="quizQuestionCount">Number of Questions per Quiz:</label>
+                    <input type="number" id="quizQuestionCount" min="5" max="20" value="10">
+                </div>
+                <div class="settings-group">
+                    <h3>Data Management</h3>
+                    <button id="backupDataBtn">Backup Data</button>
+                    <p style="font-size:0.8em; margin-top:5px;">Download all your learning progress and settings.</p>
+                    
+                    <label for="restoreFile" class="mt-1">Restore Data:</label>
+                    <input type="file" id="restoreFile" accept=".json">
+                    <p style="font-size:0.8em; margin-top:5px;">Restore from a previously backed up file. This will overwrite current data.</p>
+                </div>
+                 <div class="settings-group">
+                    <h3>Reset Application</h3>
+                    <button id="resetAppBtn" style="background-color: var(--error-color);">Reset All Data</button>
+                    <p style="font-size:0.8em; margin-top:5px;">Warning: This will erase all your progress and settings and restore the app to its initial state.</p>
+                </div>
+            </section>
+        </main>
+        
+        <div id="toast-notification"></div>
+    </div>
+
+    <script>
+        // --- Constants and Initial Data ---
+        const DB_NAME = 'BeautifulNamesDB';
+        const DB_VERSION = 1;
+        const NAMES_STORE = 'names';
+        const SETTINGS_STORE = 'settings';
+        const PROGRESS_STORE = 'progress'; // For game scores, etc. SRS data is on names items.
+
+        // Sample data (subset for brevity). A full app would have all 99+ names.
+        // Pashto translations are placeholders and may need correction.
+        const INITIAL_NAMES_DATA = [
+    // Asma ul Husna (Names of Allah)
+    { id: 1, type: "allah", arabic: "ٱلْرَّحْمَـٰنُ", transliteration: "Ar-Rahman", en: "The Beneficent", ur: "نہایت مہربان", pa: "ډېر مهربان", significance_en: "He who wills goodness and mercy for all His creatures.", significance_ur: "جو اپنی تمام مخلوقات کے لیے بھلائی اور رحمت کا ارادہ کرتا ہے۔", significance_pa: "هغه څوک چې د خپلو ټولو مخلوقاتو لپاره د خیر او رحمت اراده لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 2, type: "allah", arabic: "ٱلْرَّحِيْمُ", transliteration: "Ar-Rahim", en: "The Merciful", ur: "بہت رحم کرنے والا", pa: "ډېر رحم کوونکی", significance_en: "He who acts with extreme kindness towards the believers.", significance_ur: "جو مومنوں پر نہایت شفقت سے پیش آتا ہے۔", significance_pa: "هغه څوک چې پر مؤمنانو باندې په ډېر رحم سره چلند کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 3, type: "allah", arabic: "ٱلْمَلِكُ", transliteration: "Al-Malik", en: "The King", ur: "بادشاہ", pa: "پاچا", significance_en: "The Sovereign Lord, The One with the complete Dominion, the One Whose Dominion is clear from imperfection.", significance_ur: "خودمختار رب، وہ جس کی بادشاہی کامل ہے، وہ جس کی بادشاہی ہر عیب سے پاک ہے۔", significance_pa: "خپلواک څښتن، هغه څوک چې بشپړ واک لري، هغه څوک چې واکمني یې له نیمګړتیا څخه پاکه ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 4, type: "allah", arabic: "ٱلْقُدُّوسُ", transliteration: "Al-Quddus", en: "The Holy", ur: "پاک ذات", pa: "پاک ذات", significance_en: "The One who is pure from any imperfection and clear from children and adversaries.", significance_ur: "وہ جو ہر عیب سے پاک ہے اور اولاد اور مخالفین سے بری ہے۔", significance_pa: "هغه څوک چې له هر ډول نیمګړتیا څخه پاک دی او له اولادونو او دښمنانو څخه پاک دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 5, type: "allah", arabic: "ٱلسَّلَامُ", transliteration: "As-Salam", en: "The Source of Peace", ur: "سلامتی والا", pa: "د سولې سرچينه", significance_en: "The One who is free from every imperfection. The Giver of Peace.", significance_ur: "وہ جو ہر عیب سے پاک ہے۔ سلامتی دینے والا۔", significance_pa: "هغه څوک چې له هر ډول نیمګړتیا څخه پاک دی. د سولې ورکوونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 6, type: "allah", arabic: "ٱلْمُؤْمِنُ", transliteration: "Al-Mu'min", en: "The Guardian of Faith", ur: "ایمان بخشنے والا", pa: "د ايمان ساتونکی", significance_en: "The One who witnessed for Himself that no one is God but Him. And He witnessed for His believers that they are truthful in their belief that no one is God but Him.", significance_ur: "وہ جس نے خود گواہی دی کہ اس کے سوا کوئی معبود نہیں۔ اور اس نے اپنے مومن بندوں کے لیے گواہی دی کہ وہ اپنے اس عقیدے میں سچے ہیں کہ اس کے سوا کوئی معبود نہیں۔", significance_pa: "هغه څوک چې پخپله یې ګواهي ورکړه چې له هغه پرته بل خدای نشته. او هغه د خپلو مؤمنانو لپاره ګواهي ورکړه چې دوی په خپل باور کې ریښتیني دي چې له هغه پرته بل خدای نشته.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 7, type: "allah", arabic: "ٱلْمُهَيْمِنُ", transliteration: "Al-Muhaymin", en: "The Protector", ur: "نگہبان", pa: "ساتونکی", significance_en: "The One who witnesses the saying and deeds of His creatures.", significance_ur: "وہ جو اپنی مخلوقات کے اقوال و افعال کا گواہ ہے۔", significance_pa: "هغه څوک چې د خپلو مخلوقاتو د ویناوو او کړنو شاهد دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 8, type: "allah", arabic: "ٱلْعَزِيزُ", transliteration: "Al-Aziz", en: "The Almighty", ur: "غالب", pa: "زورور", significance_en: "The Defeater who is not defeated. The Powerful.", significance_ur: "وہ غالب جو مغلوب نہیں ہوتا۔ زبردست۔", significance_pa: "هغه غالب چې ماتې نه خوري. ځواکمن.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 9, type: "allah", arabic: "ٱلْجَبَّارُ", transliteration: "Al-Jabbar", en: "The Compeller", ur: "زبردست", pa: "جبر کوونکی", significance_en: "The One that nothing happens in His Dominion except what He willed.", significance_ur: "وہ جس کی بادشاہی میں وہی ہوتا ہے جو وہ چاہتا ہے۔", significance_pa: "هغه څوک چې په واکمنۍ کې یې یوازې هغه څه کیږي چې هغه یې وغواړي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 10, type: "allah", arabic: "ٱلْمُتَكَبِّرُ", transliteration: "Al-Mutakabbir", en: "The Majestic", ur: "بڑائی والا", pa: "لویي والا", significance_en: "The One who is clear from the attributes of the creatures and from resembling them.", significance_ur: "وہ جو مخلوقات کی صفات اور ان سے مشابہت سے پاک ہے۔", significance_pa: "هغه څوک چې د مخلوقاتو له ځانګړتیاوو او له هغوی سره له ورته والي څخه پاک دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 11, type: "allah", arabic: "ٱلْخَالِقُ", transliteration: "Al-Khaliq", en: "The Creator", ur: "پیدا کرنے والا", pa: "پیدا کوونکی", significance_en: "The One who brings everything from non-existence to existence.", significance_ur: "وہ جو ہر چیز کو عدم سے وجود میں لاتا ہے۔", significance_pa: "هغه څوک چې هر شی له نشت څخه هستۍ ته راوړي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 12, type: "allah", arabic: "ٱلْبَارِئُ", transliteration: "Al-Bari'", en: "The Maker of Order", ur: "ٹھیک بنانے والا", pa: "جوړ کوونکی", significance_en: "The One who created life. The Creator who has the Power to turn the entities.", significance_ur: "وہ جس نے زندگی پیدا کی۔ وہ خالق جو مخلوقات کو تبدیل کرنے کی قدرت رکھتا ہے۔", significance_pa: "هغه چا چې ژوند پیدا کړی. هغه خالق چې د موجوداتو د بدلولو ځواک لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 13, type: "allah", arabic: "ٱلْمُصَوِّرُ", transliteration: "Al-Musawwir", en: "The Shaper of Beauty", ur: "صورت بنانے والا", pa: "شکل ورکوونکی", significance_en: "The One who forms His creatures in different pictures.", significance_ur: "وہ جو اپنی مخلوقات کو مختلف صورتوں میں بناتا ہے۔", significance_pa: "هغه څوک چې خپل مخلوقات په مختلفو شکلونو جوړوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 14, type: "allah", arabic: "ٱلْغَفَّارُ", transliteration: "Al-Ghaffar", en: "The Forgiving", ur: "بخشنے والا", pa: "بخښونکی", significance_en: "The One who forgives the sins of His slaves time and time again.", significance_ur: "وہ جو اپنے بندوں کے گناہوں کو بار بار معاف کرتا ہے۔", significance_pa: "هغه څوک چې د خپلو بندګانو ګناوې بیا بیا بخښي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 15, type: "allah", arabic: "ٱلْقَهَّارُ", transliteration: "Al-Qahhar", en: "The Subduer", ur: "سب پر غالب", pa: "ټولو باندې غالب", significance_en: "The Dominant, The One who has the perfect Power and is not unable over anything.", significance_ur: "غالب، وہ جس کے پاس کامل طاقت ہے اور وہ کسی چیز پر عاجز نہیں۔", significance_pa: "غالب، هغه څوک چې کامل ځواک لري او په هیڅ شي باندې عاجز نه دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 16, type: "allah", arabic: "ٱلْوَهَّابُ", transliteration: "Al-Wahhab", en: "The Giver of All", ur: "سب کچھ عطا کرنے والا", pa: "هرڅه ورکونکی", significance_en: "The One who is Generous in giving plenty without any return.", significance_ur: "وہ جو بغیر کسی عوض کے کثرت سے دینے میں سخی ہے۔", significance_pa: "هغه څوک چې پرته له کوم بدل څخه په ډېره اندازه ورکولو کې سخي دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 17, type: "allah", arabic: "ٱلْرَّزَّاقُ", transliteration: "Ar-Razzaq", en: "The Sustainer", ur: "روزی دینے والا", pa: "روزي ورکوونکی", significance_en: "The Provider, The One who provides sustenance to all His creatures.", significance_ur: "فراہم کرنے والا، وہ جو اپنی تمام مخلوقات کو رزق فراہم کرتا ہے۔", significance_pa: "ورکوونکی، هغه څوک چې خپلو ټولو مخلوقاتو ته روزي ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 18, type: "allah", arabic: "ٱلْفَتَّاحُ", transliteration: "Al-Fattah", en: "The Opener", ur: "کھولنے والا", pa: "خلاصوونکی", significance_en: "The One who opens the solution to problems and allows things to be resolved.", significance_ur: "وہ جو مسائل کا حل کھولتا ہے اور چیزوں کو حل کرنے کی اجازت دیتا ہے۔", significance_pa: "هغه څوک چې د ستونزو حل خلاصوي او شیانو ته د حل کیدو اجازه ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 19, type: "allah", arabic: "ٱلْعَلِيمُ", transliteration: "Al-Alim", en: "The Knower of All", ur: "سب کچھ جاننے والا", pa: "په هرڅه پوه", significance_en: "The Knowledgeable; The One nothing is absent from His knowledge.", significance_ur: "علم والا؛ وہ جس کے علم سے کوئی چیز غائب نہیں۔", significance_pa: "پوه؛ هغه څوک چې له پوهې څخه یې هیڅ شی پټ نه دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 20, type: "allah", arabic: "ٱلْقَابِضُ", transliteration: "Al-Qabid", en: "The Constrictor", ur: "تنگ کرنے والا", pa: "تنګوونکی", significance_en: "The One who constricts the sustenance by His wisdom and expands and widens it with His Generosity and Mercy.", significance_ur: "وہ جو اپنی حکمت سے رزق کو تنگ کرتا ہے اور اپنی سخاوت اور رحمت سے اسے پھیلاتا اور وسیع کرتا ہے۔", significance_pa: "هغه څوک چې په خپل حکمت سره روزي تنګوي او په خپل سخاوت او رحمت سره یې پراخوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 21, type: "allah", arabic: "ٱلْبَاسِطُ", transliteration: "Al-Basit", en: "The Reliever", ur: "فراخ کرنے والا", pa: "پراخوونکی", significance_en: "The One who expands and widens. He who extends provision to whom He wills.", significance_ur: "وہ جو پھیلاتا اور وسیع کرتا ہے۔ وہ جسے چاہتا ہے رزق میں وسعت دیتا ہے۔", significance_pa: "هغه څوک چې پراخوي او پراخوي. هغه چا ته چې وغواړي روزي پراخه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 22, type: "allah", arabic: "ٱلْخَافِضُ", transliteration: "Al-Khafid", en: "The Abaser", ur: "پست کرنے والا", pa: "ټیټوونکی", significance_en: "The One who lowers whoever He willed by His Destruction and raises whoever He willed by His Endowment.", significance_ur: "وہ جو اپنی تباہی سے جسے چاہے پست کرتا ہے اور اپنی عطا سے جسے چاہے بلند کرتا ہے۔", significance_pa: "هغه څوک چې په خپلې تباهۍ سره څوک وغواړي ټیټوي او په خپلې ورکړې سره څوک وغواړي لوړوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 23, type: "allah", arabic: "ٱلْرَّافِعُ", transliteration: "Ar-Rafi", en: "The Exalter", ur: "بلند کرنے والا", pa: "لوړوونکی", significance_en: "The One who raises. The Exalter of the believers by His endowment.", significance_ur: "بلند کرنے والا۔ مومنوں کو اپنی عطا سے بلند کرنے والا۔", significance_pa: "لوړ کوونکی. د مؤمنانو په خپلې ورکړې سره لوړ کوونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 24, type: "allah", arabic: "ٱلْمُعِزُّ", transliteration: "Al-Mu'izz", en: "The Bestower of Honors", ur: "عزت دینے والا", pa: "عزت ورکوونکی", significance_en: "He gives esteem to whoever He willed, hence there is no one to humble him.", significance_ur: "وہ جسے چاہتا ہے عزت دیتا ہے، پس کوئی اسے ذلیل کرنے والا نہیں۔", significance_pa: "هغه چا ته چې وغواړي عزت ورکوي، نو هیڅوک یې نشي سپکولی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 25, type: "allah", arabic: "ٱلْمُذِلُّ", transliteration: "Al-Mudhill", en: "The Humiliator", ur: "ذلیل کرنے والا", pa: "سپکوونکی", significance_en: "He humiliates whoever He willed, hence there is no one to give him esteem.", significance_ur: "وہ جسے چاہتا ہے ذلیل کرتا ہے، پس کوئی اسے عزت دینے والا نہیں۔", significance_pa: "هغه څوک چې وغواړي سپکوي، نو هیڅوک یې نشي عزتمنولی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 26, type: "allah", arabic: "ٱلسَّمِيعُ", transliteration: "As-Sami", en: "The Hearer of All", ur: "سب کچھ سننے والا", pa: "هرڅه اورېدونکی", significance_en: "The One who Hears all things that are heard by His Eternal Hearing without an ear, instrument or organ.", significance_ur: "وہ جو اپنی ازلی سماعت سے تمام سنی جانے والی چیزوں کو بغیر کان، آلہ یا عضو کے سنتا ہے۔", significance_pa: "هغه څوک چې په خپل ابدي اورېدو سره ټول اورېدل شوي شیان پرته له غوږ، وسیلې یا غړي اوري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 27, type: "allah", arabic: "ٱلْبَصِيرُ", transliteration: "Al-Basir", en: "The Seer of All", ur: "سب کچھ دیکھنے والا", pa: "هرڅه لیدونکی", significance_en: "The One who Sees all things that are seen by His Eternal Seeing without a pupil or any other instrument.", significance_ur: "وہ جو اپنی ازلی بصارت سے تمام دیکھی جانے والی چیزوں کو بغیر پتلی یا کسی دوسرے آلے کے دیکھتا ہے۔", significance_pa: "هغه څوک چې په خپل ابدي لید سره ټول لیدل شوي شیان پرته له کومې وسیلې یا بلې وسیلې ګوري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 28, type: "allah", arabic: "ٱلْحَكَمُ", transliteration: "Al-Hakam", en: "The Judge", ur: "فیصلہ کرنے والا", pa: "فیصله کوونکی", significance_en: "He is the Ruler and His judgment is His Word.", significance_ur: "وہ حاکم ہے اور اس کا فیصلہ اس کا کلام ہے۔", significance_pa: "هغه حاکم دی او د هغه پریکړه د هغه کلام دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 29, type: "allah", arabic: "ٱلْعَدْلُ", transliteration: "Al-Adl", en: "The Just", ur: "انصاف کرنے والا", pa: "انصاف کوونکی", significance_en: "The One who is entitled to do what He does.", significance_ur: "وہ جو کرتا ہے اس کا حقدار ہے۔", significance_pa: "هغه څوک چې د هغه څه کولو حق لري چې هغه یې کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 30, type: "allah", arabic: "ٱللَّطِيفُ", transliteration: "Al-Latif", en: "The Subtle One", ur: "مہربان", pa: "لطیف", significance_en: "The Most Gentle, the Gracious. The One who is kind to His slaves and endows upon them.", significance_ur: "سب سے زیادہ نرم، مہربان۔ وہ جو اپنے بندوں پر مہربان ہے اور ان پر احسان کرتا ہے۔", significance_pa: "ډېر نرم، مهربان. هغه څوک چې په خپلو بندګانو مهربان دی او پر هغوی احسان کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 31, type: "allah", arabic: "ٱلْخَبِيرُ", transliteration: "Al-Khabir", en: "The All-Aware", ur: "خبردار", pa: "خبردار", significance_en: "The One who knows the truth of things.", significance_ur: "وہ جو چیزوں کی حقیقت جانتا ہے۔", significance_pa: "هغه څوک چې د شیانو حقیقت پېژني.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 32, type: "allah", arabic: "ٱلْحَلِيمُ", transliteration: "Al-Halim", en: "The Forebearing", ur: "بردبار", pa: "زغم لرونکی", significance_en: "The One who delays the punishment for those who deserve it and then He might forgive them.", significance_ur: "وہ جو مستحقین کی سزا میں تاخیر کرتا ہے اور پھر شاید انہیں معاف کر دے۔", significance_pa: "هغه څوک چې د مستحقینو سزا ځنډوي او بیا ممکن دوی وبخښي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 33, type: "allah", arabic: "ٱلْعَظِيمُ", transliteration: "Al-Azim", en: "The Magnificent", ur: "عظمت والا", pa: "عظمت والا", significance_en: "The One deserving the attributes of Exaltment, Glory, Extolement, and Purity from all imperfection.", significance_ur: "وہ جو بزرگی، جلال، تعریف اور ہر عیب سے پاکی کی صفات کا مستحق ہے۔", significance_pa: "هغه څوک چې د لوړتیا، جلال، ستاینې او له هر ډول نیمګړتیا څخه د پاکوالي ځانګړتیاوو وړ دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 34, type: "allah", arabic: "ٱلْغَفُورُ", transliteration: "Al-Ghafur", en: "The Great Forgiver", ur: "بہت بخشنے والا", pa: "ډېر بخښونکی", significance_en: "The One who forgives a lot.", significance_ur: "وہ جو بہت زیادہ معاف کرتا ہے۔", significance_pa: "هغه څوک چې ډېر بخښي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 35, type: "allah", arabic: "ٱلشَّكُورُ", transliteration: "Ash-Shakur", en: "The Rewarder of Thankfulness", ur: "قدردان", pa: "قدردان", significance_en: "The One who gives a lot of reward for a little obedience.", significance_ur: "وہ جو تھوڑی سی اطاعت پر بہت زیادہ اجر دیتا ہے۔", significance_pa: "هغه څوک چې په لږ اطاعت باندې ډېر اجر ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 36, type: "allah", arabic: "ٱلْعَلِيُّ", transliteration: "Al-Ali", en: "The Highest", ur: "بلند مرتبہ", pa: "لوړ رتبه", significance_en: "The One who is clear from the attributes of the creatures.", significance_ur: "وہ جو مخلوقات کی صفات سے پاک ہے۔", significance_pa: "هغه څوک چې د مخلوقاتو له ځانګړتیاوو څخه پاک دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 37, type: "allah", arabic: "ٱلْكَبِيرُ", transliteration: "Al-Kabir", en: "The Greatest", ur: "بہت بڑا", pa: "ډېر لوی", significance_en: "The One who is greater than everything in status.", significance_ur: "وہ جو مرتبے میں ہر چیز سے بڑا ہے۔", significance_pa: "هغه څوک چې په رتبه کې له هرڅه لوی دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 38, type: "allah", arabic: "ٱلْحَفِيظُ", transliteration: "Al-Hafiz", en: "The Preserver", ur: "حفاظت کرنے والا", pa: "ساتونکی", significance_en: "The One who protects whatever and whoever He willed to protect.", significance_ur: "وہ جو جس چیز اور جس کی حفاظت کرنا چاہے اس کی حفاظت کرتا ہے۔", significance_pa: "هغه څوک چې هرڅه او هرڅوک چې وغواړي ساتي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 39, type: "allah", arabic: "ٱلْمُقِيتُ", transliteration: "Al-Muqit", en: "The Nourisher", ur: "روزی پہنچانے والا", pa: "روزي رسوونکی", significance_en: "The Maintainer, The One who has the Power.", significance_ur: "قائم رکھنے والا، وہ جس کے پاس طاقت ہے۔", significance_pa: "ساتونکی، هغه څوک چې ځواک لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 40, type: "allah", arabic: "ٱلْحَسِيبُ", transliteration: "Al-Hasib", en: "The Accounter", ur: "حساب لینے والا", pa: "حساب اخیستونکی", significance_en: "The One who gives the satisfaction.", significance_ur: "وہ جو اطمینان دیتا ہے۔", significance_pa: "هغه څوک چې اطمینان ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 41, type: "allah", arabic: "ٱلْجَلِيلُ", transliteration: "Al-Jalil", en: "The Mighty", ur: "بزرگی والا", pa: "د لویۍ څښتن", significance_en: "The One who is attributed with greatness of Power and Glory of status.", significance_ur: "وہ جو طاقت کی عظمت اور مرتبے کی شان سے متصف ہے۔", significance_pa: "هغه څوک چې د ځواک په عظمت او د رتبې په جلال سره منسوب دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 42, type: "allah", arabic: "ٱلْكَرِيمُ", transliteration: "Al-Karim", en: "The Generous", ur: "کرم کرنے والا", pa: "کرم کوونکی", significance_en: "The One who is attributed with greatness of Power and Glory of status.", significance_ur: "وہ جو طاقت کی عظمت اور مرتبے کی شان سے متصف ہے۔", significance_pa: "هغه څوک چې د ځواک په عظمت او د رتبې په جلال سره منسوب دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 43, type: "allah", arabic: "ٱلْرَّقِيبُ", transliteration: "Ar-Raqib", en: "The Watchful One", ur: "نگہبان", pa: "څارونکی", significance_en: "The One that nothing is absent from Him. Hence it is said the Watcher.", significance_ur: "وہ جس سے کوئی چیز غائب نہیں۔ اسی لیے اسے نگران کہا جاتا ہے۔", significance_pa: "هغه څوک چې هیڅ شی ترې پټ نه دی. له همدې امله ورته څارونکی ویل کیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 44, type: "allah", arabic: "ٱلْمُجِيبُ", transliteration: "Al-Mujib", en: "The Responder to Prayer", ur: "دعا قبول کرنے والا", pa: "دعا قبلوونکی", significance_en: "The One who answers the one in need if he asks Him and rescues the yearner if he calls upon Him.", significance_ur: "وہ جو ضرورت مند کی دعا قبول کرتا ہے اگر وہ اس سے مانگے اور پکارنے والے کو بچاتا ہے اگر وہ اسے پکارے۔", significance_pa: "هغه څوک چې د اړمن ځواب ورکوي که هغه ترې وغواړي او د غوښتونکي ژغورنه کوي که هغه ورته غږ وکړي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 45, type: "allah", arabic: "ٱلْوَاسِعُ", transliteration: "Al-Wasi", en: "The All-Comprehending", ur: "وسعت والا", pa: "پراخ", significance_en: "The Knowledgeable.", significance_ur: "علم والا۔", significance_pa: "پوه.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 46, type: "allah", arabic: "ٱلْحَكِيمُ", transliteration: "Al-Hakim", en: "The Perfectly Wise", ur: "حکمت والا", pa: "حکمت والا", significance_en: "The One who is correct in His doings.", significance_ur: "وہ جو اپنے کاموں میں درست ہے۔", significance_pa: "هغه څوک چې په خپلو کړنو کې سم دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 47, type: "allah", arabic: "ٱلْوَدُودُ", transliteration: "Al-Wadud", en: "The Loving One", ur: "محبت کرنے والا", pa: "مینه کوونکی", significance_en: "The One who loves His believing slaves and His believing slaves love Him. His love for His slaves is His Will to be merciful to them and praise them.", significance_ur: "وہ جو اپنے مومن بندوں سے محبت کرتا ہے اور اس کے مومن بندے اس سے محبت کرتے ہیں۔ اپنے بندوں سے اس کی محبت ان پر رحم کرنے اور ان کی تعریف کرنے کا اس کا ارادہ ہے۔", significance_pa: "هغه څوک چې له خپلو مؤمنو بندګانو سره مینه لري او مؤمن بندګان یې له هغه سره مینه لري. د خپلو بندګانو سره د هغه مینه د دوی لپاره د رحمت اراده او د هغوی ستاینه ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 48, type: "allah", arabic: "ٱلْمَجِيدُ", transliteration: "Al-Majid", en: "The Majestic One", ur: "بزرگی والا", pa: "د لویۍ څښتن", significance_en: "The One who is with perfect Power, High Status, Compassion, Generosity and Kindness.", significance_ur: "وہ جو کامل طاقت، بلند مرتبہ، شفقت، سخاوت اور مہربانی والا ہے۔", significance_pa: "هغه څوک چې کامل ځواک، لوړ مقام، شفقت، سخاوت او مهربانۍ لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 49, type: "allah", arabic: "ٱلْبَاعِثُ", transliteration: "Al-Ba'ith", en: "The Resurrector", ur: "اٹھانے والا", pa: "راپورته کوونکی", significance_en: "The One who resurrects His slaves after death for reward and/or punishment.", significance_ur: "وہ جو اپنے بندوں کو مرنے کے بعد جزا اور/یا سزا کے لیے زندہ کرتا ہے۔", significance_pa: "هغه څوک چې خپل بندګان له مرګ وروسته د اجر او/یا سزا لپاره را ژوندي کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 50, type: "allah", arabic: "ٱلشَّهِيدُ", transliteration: "Ash-Shahid", en: "The Witness", ur: "گواہ", pa: "شاهد", significance_en: "The One who nothing is absent from His knowledge.", significance_ur: "وہ جس کے علم سے کوئی چیز غائب نہیں۔", significance_pa: "هغه څوک چې له پوهې څخه یې هیڅ شی پټ نه دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 51, type: "allah", arabic: "ٱلْحَقُّ", transliteration: "Al-Haqq", en: "The Truth", ur: "حق", pa: "حق", significance_en: "The One who truly exists.", significance_ur: "وہ جو حقیقت میں موجود ہے۔", significance_pa: "هغه څوک چې په رښتیا شتون لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 52, type: "allah", arabic: "ٱلْوَكِيلُ", transliteration: "Al-Wakil", en: "The Trustee", ur: "کارساز", pa: "کارساز", significance_en: "The One who provides the satisfaction and is relied upon.", significance_ur: "وہ جو اطمینان فراہم کرتا ہے اور جس پر بھروسہ کیا جاتا ہے۔", significance_pa: "هغه څوک چې اطمینان ورکوي او پر هغه توکل کیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 53, type: "allah", arabic: "ٱلْقَوِيُّ", transliteration: "Al-Qawiyy", en: "The Possessor of All Strength", ur: "قوت والا", pa: "ځواکمن", significance_en: "The One with the complete Power.", significance_ur: "کامل طاقت والا۔", significance_pa: "کامل ځواک لرونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 54, type: "allah", arabic: "ٱلْمَتِينُ", transliteration: "Al-Matin", en: "The Forceful One", ur: "مضبوط", pa: "کلک", significance_en: "The One with extreme Power which is un-interrupted and He does not get tired.", significance_ur: "وہ جس کے پاس بے پناہ طاقت ہے جو بلا تعطل ہے اور وہ تھکتا نہیں۔", significance_pa: "هغه څوک چې ډېر ځواک لري چې بې له ځنډه دی او ستړی نه کیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 55, type: "allah", arabic: "ٱلْوَلِيُّ", transliteration: "Al-Waliyy", en: "The Governor", ur: "حمایتی", pa: "ملاتړ کوونکی", significance_en: "The Supporter, The Friend of the Believers, The One who owns things and manages them.", significance_ur: "مددگار، مومنوں کا دوست، وہ جو چیزوں کا مالک ہے اور ان کا انتظام کرتا ہے۔", significance_pa: "ملاتړ کوونکی، د مؤمنانو دوست، هغه څوک چې د شیانو مالک دی او اداره کوي یې.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 56, type: "allah", arabic: "ٱلْحَمِيدُ", transliteration: "Al-Hamid", en: "The Praised One", ur: "تعریف والا", pa: "د ستاینې وړ", significance_en: "The praised One who deserves to be praised.", significance_ur: "قابل تعریف ذات جو تعریف کی مستحق ہے۔", significance_pa: "د ستاینې وړ ذات چې د ستاینې وړ دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 57, type: "allah", arabic: "ٱلْمُحْصِيُ", transliteration: "Al-Muhsi", en: "The Appraiser", ur: "شمار کرنے والا", pa: "شمېرونکی", significance_en: "The One who the count of things are known to him.", significance_ur: "وہ جسے چیزوں کی گنتی معلوم ہے۔", significance_pa: "هغه څوک چې د شیانو شمېر ورته معلوم دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 58, type: "allah", arabic: "ٱلْمُبْدِئُ", transliteration: "Al-Mubdi'", en: "The Originator", ur: "پہلی بار پیدا کرنے والا", pa: "لومړی ځل پیدا کوونکی", significance_en: "The One who started the human being. That is, He created him.", significance_ur: "وہ جس نے انسان کو شروع کیا۔ یعنی اس نے اسے پیدا کیا۔", significance_pa: "هغه چا چې انسان پیل کړ. یعنی هغه یې پیدا کړ.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 59, type: "allah", arabic: "ٱلْمُعِيدُ", transliteration: "Al-Mu'id", en: "The Restorer", ur: "دوبارہ پیدا کرنے والا", pa: "بیا پیدا کوونکی", significance_en: "The One who brings back the creatures after death.", significance_ur: "وہ جو مخلوقات کو مرنے کے بعد واپس لاتا ہے۔", significance_pa: "هغه څوک چې مخلوقات له مرګ وروسته بېرته راولي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 60, type: "allah", arabic: "ٱلْمُحْيِى", transliteration: "Al-Muhyi", en: "The Giver of Life", ur: "زندگی دینے والا", pa: "ژوند ورکوونکی", significance_en: "The One who took out a living human from semen that does not have a soul. He gives life by giving the souls back to the worn out bodies on the resurrection day and He makes the hearts alive by the light of knowledge.", significance_ur: "وہ جس نے بے جان نطفے سے زندہ انسان نکالا۔ وہ قیامت کے دن بوسیدہ جسموں میں روحیں واپس دے کر زندگی بخشتا ہے اور علم کی روشنی سے دلوں کو زندہ کرتا ہے۔", significance_pa: "هغه چا چې له بې روحه نطفې څخه ژوندی انسان را وایست. هغه د قیامت په ورځ زړو بدنونو ته روحونه بېرته ورکولو سره ژوند ورکوي او د پوهې په رڼا سره زړونه ژوندي کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 61, type: "allah", arabic: "ٱلْمُمِيتُ", transliteration: "Al-Mumit", en: "The Taker of Life", ur: "موت دینے والا", pa: "مرګ ورکوونکی", significance_en: "The One who renders the living dead.", significance_ur: "وہ جو زندہ کو مردہ کر دیتا ہے۔", significance_pa: "هغه څوک چې ژوندي مړه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 62, type: "allah", arabic: "ٱلْحَيُّ", transliteration: "Al-Hayy", en: "The Ever Living One", ur: "ہمیشہ زندہ رہنے والا", pa: "تل ژوندی", significance_en: "The One attributed with a life that is unlike our life and is not that of a combination of soul, flesh or blood.", significance_ur: "وہ ذات جو ایسی زندگی سے متصف ہے جو ہماری زندگی جیسی نہیں اور نہ ہی روح، گوشت یا خون کا مجموعہ ہے۔", significance_pa: "هغه ذات چې په داسې ژوند سره منسوب دی چې زموږ د ژوند په څېر نه دی او نه د روح، غوښې یا وینې ترکیب دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 63, type: "allah", arabic: "ٱلْقَيُّومُ", transliteration: "Al-Qayyum", en: "The Self-Existing One", ur: "سب کو قائم رکھنے والا", pa: "ټول قائم ساتونکی", significance_en: "The One who remains and does not end.", significance_ur: "وہ جو باقی رہتا ہے اور ختم نہیں ہوتا۔", significance_pa: "هغه څوک چې پاتې کیږي او پای ته نه رسیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 64, type: "allah", arabic: "ٱلْوَاجِدُ", transliteration: "Al-Wajid", en: "The Finder", ur: "پانے والا", pa: "موندونکی", significance_en: "The Rich who is never poor. Al-Wajd is Richness.", significance_ur: "وہ امیر جو کبھی غریب نہیں ہوتا۔ الوجد امیری ہے۔", significance_pa: "هغه شتمن چې هیڅکله غریب نه وي. الوجد شتمني ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 65, type: "allah", arabic: "ٱلْمَاجِدُ", transliteration: "Al-Maajid", en: "The Glorious", ur: "بزرگی والا", pa: "د لویۍ څښتن", significance_en: "The One who is glorious and He is the source of all glory.", significance_ur: "وہ جو شان والا ہے اور وہی تمام شان کا سرچشمہ ہے۔", significance_pa: "هغه څوک چې جلال لري او هغه د ټولو جلال سرچینه ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } }, // Note: Al-Majid is repeated, often Al-Wajid is used here. Using Maajid as per some lists.
+    { id: 66, type: "allah", arabic: "ٱلْوَاحِدُ", transliteration: "Al-Wahid", en: "The One", ur: "ایک", pa: "یو", significance_en: "The One without a partner.", significance_ur: "شریک کے بغیر ایک۔", significance_pa: "بې شریکه یو.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 67, type: "allah", arabic: "ٱلْأَحَدُ", transliteration: "Al-Ahad", en: "The Unique, The Only One", ur: "اکیلا", pa: "یوازینی", significance_en: "The One who has no second, indivisible.", significance_ur: "وہ جس کا کوئی ثانی نہیں، ناقابل تقسیم۔", significance_pa: "هغه څوک چې دوهم نه لري، نه وېشل کېدونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } }, // Often Al-Ahad is used as number 67, some lists use As-Samad.
+    { id: 68, type: "allah", arabic: "ٱلصَّمَدُ", transliteration: "As-Samad", en: "The Eternal", ur: "بے نیاز", pa: "بې نیازه", significance_en: "The Master who is relied upon in matters and reverted to in ones needs.", significance_ur: "وہ آقا جس پر معاملات میں بھروسہ کیا جاتا ہے اور اپنی ضروریات میں اس کی طرف رجوع کیا جاتا ہے۔", significance_pa: "هغه مالک چې په چارو کې پرې توکل کیږي او په اړتیاوو کې ورته رجوع کیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 69, type: "allah", arabic: "ٱلْقَادِرُ", transliteration: "Al-Qadir", en: "The All-Powerful", ur: "قدرت والا", pa: "ځواکمن", significance_en: "The One attributed with Power.", significance_ur: "طاقت سے متصف ذات۔", significance_pa: "په ځواک سره منسوب ذات.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 70, type: "allah", arabic: "ٱلْمُقْتَدِرُ", transliteration: "Al-Muqtadir", en: "The Creator of All Power", ur: "سب پر قادر", pa: "په هرڅه قادر", significance_en: "The One with the perfect Power that nothing is withheld from Him.", significance_ur: "وہ جس کے پاس کامل طاقت ہے کہ کوئی چیز اس سے روکی نہیں جا سکتی۔", significance_pa: "هغه څوک چې کامل ځواک لري چې هیڅ شی ترې نشي منع کیدی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 71, type: "allah", arabic: "ٱلْمُقَدِّمُ", transliteration: "Al-Muqaddim", en: "The Expediter", ur: "آگے کرنے والا", pa: "مخکې کوونکی", significance_en: "He makes ahead what He wills and delays what He wills.", significance_ur: "وہ جسے چاہتا ہے آگے کرتا ہے اور جسے چاہتا ہے پیچھے کرتا ہے۔", significance_pa: "هغه څه چې وغواړي مخکې کوي او څه چې وغواړي وروسته کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 72, type: "allah", arabic: "ٱلْمُؤَخِّرُ", transliteration: "Al-Mu'akhkhir", en: "The Delayer", ur: "پیچھے کرنے والا", pa: "وروسته کوونکی", significance_en: "He delays what He wills.", significance_ur: "وہ جسے چاہتا ہے پیچھے کرتا ہے۔", significance_pa: "هغه څه چې وغواړي وروسته کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 73, type: "allah", arabic: "ٱلْأَوَّلُ", transliteration: "Al-Awwal", en: "The First", ur: "سب سے پہلے", pa: "لومړی", significance_en: "The One whose Existence is without a beginning.", significance_ur: "وہ جس کا وجود بغیر آغاز کے ہے۔", significance_pa: "هغه څوک چې وجود یې له پیل پرته دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 74, type: "allah", arabic: "ٱلْآخِرُ", transliteration: "Al-Akhir", en: "The Last", ur: "سب سے آخر", pa: "وروستی", significance_en: "The One whose Existence is without an end.", significance_ur: "وہ جس کا وجود بغیر انتہا کے ہے۔", significance_pa: "هغه څوک چې وجود یې له پای پرته دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 75, type: "allah", arabic: "ٱلظَّاهِرُ", transliteration: "Az-Zahir", en: "The Manifest One", ur: "ظاہر", pa: "ښکاره", significance_en: "The One that nothing is above Him and nothing is underneath Him, hence He exists without a place.", significance_ur: "وہ جس کے اوپر کوئی چیز نہیں اور جس کے نیچے کوئی چیز نہیں، لہٰذا وہ بغیر جگہ کے موجود ہے۔", significance_pa: "هغه څوک چې هیڅ شی د هغه څخه پورته نه دی او هیڅ شی د هغه لاندې نه دی، نو هغه پرته له ځای څخه شتون لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 76, type: "allah", arabic: "ٱلْبَاطِنُ", transliteration: "Al-Batin", en: "The Hidden One", ur: "پوشیدہ", pa: "پټ", significance_en: "The One that nothing is above Him and nothing is underneath Him, hence He exists without a place. He is clear from the delusions of attributes of bodies.", significance_ur: "وہ جس کے اوپر کوئی چیز نہیں اور جس کے نیچے کوئی چیز نہیں، لہٰذا وہ بغیر جگہ کے موجود ہے۔ وہ جسموں کی صفات کے وہموں سے پاک ہے۔", significance_pa: "هغه څوک چې هیڅ شی د هغه څخه پورته نه دی او هیڅ شی د هغه لاندې نه دی، نو هغه پرته له ځای څخه شتون لري. هغه د بدنونو د ځانګړتیاوو له وهمونو څخه پاک دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 77, type: "allah", arabic: "ٱلْوَالِي", transliteration: "Al-Wali", en: "The Protecting Friend", ur: "مالک", pa: "مالک", significance_en: "The One who owns things and manages them.", significance_ur: "وہ جو چیزوں کا مالک ہے اور ان کا انتظام کرتا ہے۔", significance_pa: "هغه څوک چې د شیانو مالک دی او اداره کوي یې.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 78, type: "allah", arabic: "ٱلْمُتَعَالِي", transliteration: "Al-Muta'ali", en: "The Supreme One", ur: "سب سے بلند", pa: "تر ټولو لوړ", significance_en: "The One who is clear from the attributes of the creation.", significance_ur: "وہ جو مخلوق کی صفات سے پاک ہے۔", significance_pa: "هغه څوک چې د مخلوق له ځانګړتیاوو څخه پاک دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 79, type: "allah", arabic: "ٱلْبَرُّ", transliteration: "Al-Barr", en: "The Doer of Good", ur: "نیکی کرنے والا", pa: "نېکي کوونکی", significance_en: "The One who is kind to His creatures, who covered them with His sustenance and specified whoever He willed among them by His support, protection, and special mercy.", significance_ur: "وہ جو اپنی مخلوقات پر مہربان ہے، جس نے انہیں اپنے رزق سے ڈھانپ لیا اور ان میں سے جسے چاہا اپنی مدد، حفاظت اور خاص رحمت سے مخصوص کیا۔", significance_pa: "هغه څوک چې په خپلو مخلوقاتو مهربان دی، چا چې دوی په خپل رزق پوښلي او په دوی کې یې هر څوک چې وغواړي په خپل ملاتړ، ساتنې او ځانګړي رحمت سره ځانګړی کړی دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 80, type: "allah", arabic: "ٱلتَّوَّابُ", transliteration: "At-Tawwab", en: "The Guide to Repentance", ur: "توبہ قبول کرنے والا", pa: "توبه قبلوونکی", significance_en: "The One who grants repentance to whoever He willed among His creatures and accepts his repentance.", significance_ur: "وہ جو اپنی مخلوقات میں سے جسے چاہتا ہے توبہ کی توفیق دیتا ہے اور اس کی توبہ قبول کرتا ہے۔", significance_pa: "هغه څوک چې په خپلو مخلوقاتو کې چا ته وغواړي توبه ورکوي او توبه یې قبلوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 81, type: "allah", arabic: "ٱلْمُنْتَقِمُ", transliteration: "Al-Muntaqim", en: "The Avenger", ur: "انتقام لینے والا", pa: "انتقام اخیستونکی", significance_en: "The One who victoriously prevails over His enemies and punishes them for their sins. It may mean the One who destroys them.", significance_ur: "وہ جو اپنے دشمنوں پر غالب آتا ہے اور انہیں ان کے گناہوں کی سزا دیتا ہے۔ اس کا مطلب یہ بھی ہو سکتا ہے کہ وہ انہیں تباہ کر دیتا ہے۔", significance_pa: "هغه څوک چې پر خپلو دښمنانو برلاسی کیږي او د هغوی د ګناهونو سزا ورکوي. دا کیدای شي په دې معنی وي چې هغه دوی تباه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 82, type: "allah", arabic: "ٱلْعَفُوُّ", transliteration: "Al-Afuww", en: "The Pardoner", ur: "معاف کرنے والا", pa: "معاف کوونکی", significance_en: "The One with wide forgiveness.", significance_ur: "وسیع مغفرت والا۔", significance_pa: "پراخه بخښنه لرونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 83, type: "allah", arabic: "ٱلْرَّءُوفُ", transliteration: "Ar-Ra'uf", en: "The Clement", ur: "بہت مہربان", pa: "ډېر مهربان", significance_en: "The One with extreme Mercy. The Mercy of Allah is His will to endow upon whoever He willed among His creatures.", significance_ur: "انتہائی رحم والا۔ اللہ کی رحمت اس کا ارادہ ہے کہ وہ اپنی مخلوقات میں سے جسے چاہے عطا کرے۔", significance_pa: "ډېر رحم لرونکی. د الله رحمت د هغه اراده ده چې په خپلو مخلوقاتو کې چا ته وغواړي ورکړي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 84, type: "allah", arabic: "مَالِكُ ٱلْمُلْكِ", transliteration: "Malik-ul-Mulk", en: "The Owner of All", ur: "بادشاہی کا مالک", pa: "د ټول واک مالک", significance_en: "The One who controls the Dominion and gives dominion to whoever He willed.", significance_ur: "وہ جو بادشاہی کو کنٹرول کرتا ہے اور جسے چاہتا ہے بادشاہی دیتا ہے۔", significance_pa: "هغه څوک چې واکمني کنټرولوي او چا ته چې وغواړي واکمني ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 85, type: "allah", arabic: "ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ", transliteration: "Dhul-Jalali wal-Ikram", en: "The Lord of Majesty and Bounty", ur: "جلال اور اکرام والا", pa: "د جلال او اکرام څښتن", significance_en: "The One who deserves to be Exalted and not denied.", significance_ur: "وہ جو بزرگی کا مستحق ہے اور اس کا انکار نہیں کیا جا سکتا۔", significance_pa: "هغه څوک چې د لوړتیا وړ دی او انکار یې نشي کیدی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 86, type: "allah", arabic: "ٱلْمُقْسِطُ", transliteration: "Al-Muqsit", en: "The Equitable One", ur: "انصاف کرنے والا", pa: "انصاف کوونکی", significance_en: "The One who is Just in His judgment.", significance_ur: "وہ جو اپنے فیصلے میں عادل ہے۔", significance_pa: "هغه څوک چې په خپله پریکړه کې عادل دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 87, type: "allah", arabic: "ٱلْجَامِعُ", transliteration: "Al-Jami", en: "The Gatherer", ur: "جمع کرنے والا", pa: "راټولوونکی", significance_en: "The One who gathers the creatures on a day that there is no doubt about, that is the Day of Judgment.", significance_ur: "وہ جو مخلوقات کو اس دن جمع کرتا ہے جس میں کوئی شک نہیں، یعنی قیامت کا دن۔", significance_pa: "هغه څوک چې مخلوقات په هغه ورځ راټولوي چې په اړه یې هیڅ شک نشته، یعنی د قیامت ورځ.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 88, type: "allah", arabic: "ٱلْغَنِيُّ", transliteration: "Al-Ghaniyy", en: "The Rich One", ur: "بے نیاز", pa: "بې نیازه", significance_en: "The One who does not need the creation.", significance_ur: "وہ جسے مخلوق کی ضرورت نہیں۔", significance_pa: "هغه څوک چې مخلوق ته اړتیا نه لري.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 89, type: "allah", arabic: "ٱلْمُغْنِي", transliteration: "Al-Mughni", en: "The Enricher", ur: "بے نیاز کرنے والا", pa: "بې نیازه کوونکی", significance_en: "The One who satisfies the necessities of the creatures.", significance_ur: "وہ جو مخلوقات کی ضروریات پوری کرتا ہے۔", significance_pa: "هغه څوک چې د مخلوقاتو اړتیاوې پوره کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 90, type: "allah", arabic: "ٱلْمَانِعُ", transliteration: "Al-Mani", en: "The Preventer of Harm", ur: "روکنے والا", pa: "منع کوونکی", significance_en: "The Withholder.", significance_ur: "روکنے والا۔", significance_pa: "منع کوونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 91, type: "allah", arabic: "ٱلضَّارُّ", transliteration: "Ad-Darr", en: "The Creator of The Harmful", ur: "نقصان پہنچانے والا", pa: "زیان رسوونکی", significance_en: "The One who makes harm reach to whoever He willed.", significance_ur: "وہ جو جسے چاہے نقصان پہنچاتا ہے۔", significance_pa: "هغه څوک چې چا ته وغواړي زیان رسوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } }, // Note: Some scholars prefer not to list Ad-Darr and An-Nafi as primary names but attributes of action. Included for completeness of common lists.
+    { id: 92, type: "allah", arabic: "ٱلنَّافِعُ", transliteration: "An-Nafi", en: "The Creator of Good", ur: "نفع دینے والا", pa: "ګټه رسوونکی", significance_en: "The One who makes good reach to whoever He willed.", significance_ur: "وہ جو جسے چاہے نفع پہنچاتا ہے۔", significance_pa: "هغه څوک چې چا ته وغواړي ګټه رسوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 93, type: "allah", arabic: "ٱلنُّورُ", transliteration: "An-Nur", en: "The Light", ur: "روشنی", pa: "رڼا", significance_en: "The One who guides.", significance_ur: "ہدایت دینے والا۔", significance_pa: "لارښوونه کوونکی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 94, type: "allah", arabic: "ٱلْهَادِي", transliteration: "Al-Hadi", en: "The Guide", ur: "ہدایت دینے والا", pa: "لارښود", significance_en: "The One whom He guides is rightly guided and the one whom He misguides is astray.", significance_ur: "وہ جسے ہدایت دیتا ہے وہ ہدایت یافتہ ہے اور جسے وہ گمراہ کرتا ہے وہ گمراہ ہے۔", significance_pa: "هغه څوک چې هغه لارښوونه کوي هغه سم لارښود دی او هغه څوک چې هغه ګمراه کوي هغه ګمراه دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 95, type: "allah", arabic: "ٱلْبَدِيعُ", transliteration: "Al-Badi", en: "The Originator", ur: "بے مثال پیدا کرنے والا", pa: "بې مثاله پیدا کوونکی", significance_en: "The One who created the creation and formed it without any preceding example.", significance_ur: "وہ جس نے مخلوق کو پیدا کیا اور اسے بغیر کسی سابقہ مثال کے تشکیل دیا۔", significance_pa: "هغه چا چې مخلوق پیدا کړی او پرته له کومې پخوانۍ بېلګې یې جوړ کړی دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 96, type: "allah", arabic: "ٱلْبَاقِي", transliteration: "Al-Baqi", en: "The Everlasting One", ur: "ہمیشہ باقی رہنے والا", pa: "تل پاتې کېدونکی", significance_en: "The One that the state of non-existence is impossible for Him.", significance_ur: "وہ جس کے لیے عدم کی حالت ناممکن ہے۔", significance_pa: "هغه څوک چې د هغه لپاره د نشتوالي حالت ناممکن دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 97, type: "allah", arabic: "ٱلْوَارِثُ", transliteration: "Al-Warith", en: "The Inheritor of All", ur: "سب کا وارث", pa: "د ټولو وارث", significance_en: "The One whose Existence remains.", significance_ur: "وہ جس کا وجود باقی رہتا ہے۔", significance_pa: "هغه څوک چې وجود یې پاتې کیږي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 98, type: "allah", arabic: "ٱلرَّشِيدُ", transliteration: "Ar-Rashid", en: "The Righteous Teacher", ur: "سیدھی راہ دکھانے والا", pa: "سیده لار ښوونکی", significance_en: "The One who guides. The One whose guidance is upright.", significance_ur: "ہدایت دینے والا۔ وہ جس کی ہدایت سیدھی ہے۔", significance_pa: "لارښوونه کوونکی. هغه څوک چې لارښوونه یې سمه ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 99, type: "allah", arabic: "ٱلصَّبُورُ", transliteration: "As-Sabur", en: "The Patient One", ur: "صبر کرنے والا", pa: "صبر کوونکی", significance_en: "The One who does not quickly punish the sinners.", significance_ur: "وہ جو گنہگاروں کو جلد سزا نہیں دیتا۔", significance_pa: "هغه څوک چې ګناهکارانو ته ژر سزا نه ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+
+    // Prophet Muhammad (PBUH) Names
+    { id: 101, type: "prophet", arabic: "مُحَمَّدٌ", transliteration: "Muhammad", en: "Praised One", ur: "تعریف کیا گیا", pa: "ستايل شوی", significance_en: "The one who is praised abundantly. This is his most famous name.", significance_ur: "وہ ذات جس کی کثرت سے تعریف کی جائے۔ یہ آپ کا سب سے مشہور نام ہے۔", significance_pa: "هغه څوک چې ډېره ستاينه يې کيږي. دا د هغه تر ټولو مشهور نوم دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 102, type: "prophet", arabic: "أَحْمَدُ", transliteration: "Ahmad", en: "Most Praiseworthy", ur: "سب سے زیادہ قابل تعریف", pa: "ډېر د ستاينې وړ", significance_en: "The one who is most deserving of praise, or one who praises Allah the most.", significance_ur: "وہ ذات جو سب سے زیادہ تعریف کی مستحق ہے، یا وہ جو اللہ کی سب سے زیادہ حمد کرتا ہے۔", significance_pa: "هغه څوک چې د ستاينې تر ټولو وړ وي، يا هغه څوک چې د الله ډېره ستاينه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 103, type: "prophet", arabic: "ٱلْمَاحِي", transliteration: "Al-Mahi", en: "The Eraser", ur: "مٹانے والا", pa: "له منځه وړونکی", significance_en: "The one through whom Allah erases disbelief.", significance_ur: "وہ ذات جس کے ذریعے اللہ کفر کو مٹاتا ہے۔", significance_pa: "هغه څوک چې د هغه له لارې الله کفر له منځه وړي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 104, type: "prophet", arabic: "ٱلْحَاشِرُ", transliteration: "Al-Hashir", en: "The Gatherer", ur: "جمع کرنے والا", pa: "راټولوونکی", significance_en: "The one at whose feet mankind will be gathered on the Day of Judgment.", significance_ur: "وہ ذات جس کے قدموں پر قیامت کے دن انسان جمع ہوں گے۔", significance_pa: "هغه څوک چې د قیامت په ورځ به خلک د هغه په پښو کې راټول شي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 105, type: "prophet", arabic: "ٱلْعَاقِبُ", transliteration: "Al-Aqib", en: "The Last in Succession", ur: "سب سے آخر میں آنے والا", pa: "په پای کې راتلونکی", significance_en: "The one who comes last, the final Prophet after whom there is no other.", significance_ur: "وہ ذات جو سب سے آخر میں آئے، آخری نبی جس کے بعد کوئی نبی نہیں۔", significance_pa: "هغه څوک چې په پای کې راځي، وروستی پیغمبر چې له هغه وروسته بل پیغمبر نشته.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 106, type: "prophet", arabic: "نَبِيُّ ٱلرَّحْمَةِ", transliteration: "Nabiyy-ur-Rahmah", en: "The Prophet of Mercy", ur: "رحمت کے نبی", pa: "د رحمت پيغمبر", significance_en: "He was sent as a mercy to all worlds.", significance_ur: "آپ کو تمام جہانوں کے لیے رحمت بنا کر بھیجا گیا۔", significance_pa: "هغه د ټول عالم لپاره د رحمت په توګه رالېږل شوی و.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 107, type: "prophet", arabic: "نَبِيُّ ٱلتَّوْبَةِ", transliteration: "Nabiyy-ut-Taubah", en: "The Prophet of Repentance", ur: "توبہ کے نبی", pa: "د توبې پيغمبر", significance_en: "He called people to repentance and guided them towards it.", significance_ur: "آپ نے لوگوں کو توبہ کی طرف بلایا اور اس کی طرف رہنمائی کی۔", significance_pa: "هغه خلک توبې ته راوبلل او هغوی ته یې لارښوونه وکړه.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 108, type: "prophet", arabic: "ٱلرَّسُولُ", transliteration: "Ar-Rasul", en: "The Messenger", ur: "رسول", pa: "استازی", significance_en: "The one sent by Allah with a message to mankind.", significance_ur: "اللہ کی طرف سے انسانوں کے لیے پیغام لے کر بھیجا گیا۔", significance_pa: "د الله له خوا انسانانو ته د پیغام سره رالېږل شوی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 109, type: "prophet", arabic: "ٱلنَّبِيُّ", transliteration: "An-Nabi", en: "The Prophet", ur: "نبی", pa: "پيغمبر", significance_en: "The one who receives revelation from Allah.", significance_ur: "وہ جسے اللہ کی طرف سے وحی آتی ہے۔", significance_pa: "هغه څوک چې د الله له خوا وحی ترلاسه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 110, type: "prophet", arabic: "ٱلْأُمِّيُّ", transliteration: "Al-Ummi", en: "The Unlettered Prophet", ur: "امی نبی", pa: "امي پيغمبر", significance_en: "The one who was unlettered, could not read or write, making the Quran an undeniable miracle.", significance_ur: "وہ جو امی تھے، پڑھنا لکھنا نہیں جانتے تھے، جس سے قرآن ایک ناقابل تردید معجزہ بن گیا۔", significance_pa: "هغه څوک چې امی و، لوستل او لیکل یې نه شوای کولی، چې قرآن یې یو نه انکارېدونکی معجزه ګرځولې ده.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 111, type: "prophet", arabic: "ٱلشَّاهِدُ", transliteration: "Ash-Shahid", en: "The Witness", ur: "گواہ", pa: "شاهد", significance_en: "He is a witness over the believers and the actions of humanity.", significance_ur: "آپ مومنوں اور انسانیت کے اعمال پر گواہ ہیں۔", significance_pa: "هغه پر مؤمنانو او د بشریت پر کړنو شاهد دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 112, type: "prophet", arabic: "ٱلْمُبَشِّرُ", transliteration: "Al-Mubashshir", en: "The Bearer of Glad Tidings", ur: "خوشخبری دینے والا", pa: "زېری ورکوونکی", significance_en: "He brings good news of Paradise to the believers.", significance_ur: "آپ مومنوں کو جنت کی خوشخبری سناتے ہیں۔", significance_pa: "هغه مؤمنانو ته د جنت زېری ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 113, type: "prophet", arabic: "ٱلنَّذِيرُ", transliteration: "An-Nadhir", en: "The Warner", ur: "ڈرانے والا", pa: "وېروونکی", significance_en: "He warns of the punishment for those who disbelieve or disobey.", significance_ur: "آپ کفر کرنے والوں یا نافرمانی کرنے والوں کو عذاب سے ڈراتے ہیں۔", significance_pa: "هغه د کافرانو یا نافرمانو لپاره د عذاب خبرداری ورکوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 114, type: "prophet", arabic: "ٱلدَّاعِي", transliteration: "Ad-Da'i", en: "The Caller (to Allah)", ur: "اللہ کی طرف بلانے والا", pa: "الله ته بلونکی", significance_en: "He calls humanity towards Allah and His path.", significance_ur: "آپ انسانیت کو اللہ اور اس کے راستے کی طرف بلاتے ہیں۔", significance_pa: "هغه بشریت الله او د هغه لارې ته رابولي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 115, type: "prophet", arabic: "سِرَاجٌ مُنِيرٌ", transliteration: "Sirajun Munir", en: "A Shining Lamp", ur: "روشن چراغ", pa: "روښانه څراغ", significance_en: "He illuminates the path to guidance like a shining lamp.", significance_ur: "آپ روشن چراغ کی طرح ہدایت کا راستہ روشن کرتے ہیں۔", significance_pa: "هغه د روښانه څراغ په څېر د هدایت لاره روښانه کوي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 116, type: "prophet", arabic: "رَؤُوفٌ رَحِيمٌ", transliteration: "Ra'ufun Rahim", en: "Most Kind, Most Merciful", ur: "نہایت مہربان، رحم کرنے والا", pa: "ډېر مهربان، رحم کوونکی", significance_en: "He is described with attributes of kindness and mercy towards the believers.", significance_ur: "آپ کو مومنوں کے ساتھ مہربانی اور رحم کی صفات سے متصف کیا گیا ہے۔", significance_pa: "هغه د مؤمنانو په وړاندې د مهربانۍ او رحم په صفتونو سره بیان شوی دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 117, type: "prophet", arabic: "ٱلْمُصْطَفَىٰ", transliteration: "Al-Mustafa", en: "The Chosen One", ur: "چنا ہوا", pa: "غوره شوی", significance_en: "Allah chose him above all creation.", significance_ur: "اللہ نے آپ کو تمام مخلوقات پر چن لیا۔", significance_pa: "الله هغه له ټول مخلوق څخه غوره کړی دی.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 118, type: "prophet", arabic: "ٱلْمُجْتَبَىٰ", transliteration: "Al-Mujtaba", en: "The Elect", ur: "منتخب کیا ہوا", pa: "ټاکل شوی", significance_en: "He was selected and chosen by Allah for His message.", significance_ur: "آپ کو اللہ نے اپنے پیغام کے لیے منتخب کیا۔", significance_pa: "هغه د الله له خوا د خپل پیغام لپاره ټاکل شوی و.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 119, type: "prophet", arabic: "ٱلْأَمِينُ", transliteration: "Al-Amin", en: "The Trustworthy", ur: "امانت دار", pa: "امانتدار", significance_en: "He was known for his honesty and trustworthiness even before prophethood.", significance_ur: "آپ نبوت سے پہلے بھی اپنی ایمانداری اور امانتداری کے لیے مشہور تھے۔", significance_pa: "هغه حتی له پیغمبرۍ مخکې هم د خپل صداقت او امانتدارۍ لپاره مشهور و.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 120, type: "prophet", arabic: "صَادِقُ ٱلْوَعْدِ", transliteration: "Sadiq-ul-Wa'd", en: "Truthful in Promise", ur: "وعدے کا سچا", pa: "په وعده رښتینی", significance_en: "He always fulfilled his promises.", significance_ur: "آپ نے ہمیشہ اپنے وعدے پورے کیے۔", significance_pa: "هغه تل خپلې وعدې پوره کړې.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+    { id: 121, type: "prophet", arabic: "خَاتَمُ ٱلنَّبِيِّينَ", transliteration: "Khatam-un-Nabiyyin", en: "The Seal of the Prophets", ur: "نبیوں کا خاتم", pa: "د پيغمبرانو مهر", significance_en: "He is the last prophet, and no prophet will come after him.", significance_ur: "آپ آخری نبی ہیں، اور آپ کے بعد کوئی نبی نہیں آئے گا۔", significance_pa: "هغه وروستی پیغمبر دی، او له هغه وروسته به بل پیغمبر نه راځي.", srs_data: { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null } },
+];
+
+        let db;
+        let currentLanguage = 'en';
+        let allNamesData = []; // Cache for all names from DB
+
+        // --- IndexedDB Utility Functions ---
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onupgradeneeded = (event) => {
+                    db = event.target.result;
+                    if (!db.objectStoreNames.contains(NAMES_STORE)) {
+                        const namesOS = db.createObjectStore(NAMES_STORE, { keyPath: 'id' });
+                        namesOS.createIndex('type', 'type', { unique: false });
+                        namesOS.createIndex('due_date_idx', 'srs_data.due_date', {unique: false});
+                    }
+                    if (!db.objectStoreNames.contains(SETTINGS_STORE)) {
+                        db.createObjectStore(SETTINGS_STORE, { keyPath: 'key' });
+                    }
+                    if (!db.objectStoreNames.contains(PROGRESS_STORE)) {
+                        db.createObjectStore(PROGRESS_STORE, { autoIncrement: true });
+                        // Example: { game: 'match', score: 100, date: timestamp }
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    resolve(db);
+                };
+
+                request.onerror = (event) => {
+                    console.error('Database error:', event.target.errorCode);
+                    reject(event.target.errorCode);
+                };
+            });
+        }
+
+        function addObject(storeName, object) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.add(object);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+        
+        function getObject(storeName, key) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function getAllObjects(storeName) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+        
+        function updateObject(storeName, object) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.put(object); // put handles add or update
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function deleteObject(storeName, key) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.delete(key);
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function clearStore(storeName) {
+            return new Promise((resolve, reject) => {
+                if (!db) { reject("DB not initialized"); return; }
+                const transaction = db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+
+        // --- Toast Notification ---
+        const toastElement = document.getElementById('toast-notification');
+        function showToast(message, type = 'info', duration = 3000) {
+            toastElement.textContent = message;
+            toastElement.className = 'show'; // Reset classes
+            if (type === 'error') toastElement.classList.add('error');
+            if (type === 'success') toastElement.classList.add('success');
+            
+            setTimeout(() => {
+                toastElement.className = toastElement.className.replace('show', '');
+            }, duration);
+        }
+
+        // --- Navigation ---
+        const screens = document.querySelectorAll('.screen');
+        const navButtons = document.querySelectorAll('#main-nav button');
+
+        function navigateTo(screenId) {
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            navButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.dataset.screen === screenId) {
+                    button.classList.add('active');
+                }
+            });
+            const activeScreen = document.getElementById(screenId);
+            if (activeScreen) {
+                activeScreen.classList.add('active');
+                // Call screen-specific load functions if needed
+                if (screenId === 'list-names-screen') loadNamesList();
+                if (screenId === 'match-game-screen') setupMatchGame();
+                if (screenId === 'quiz-game-screen') setupQuizGame();
+                if (screenId === 'srs-review-screen') loadSrsReviewItems();
+                if (screenId === 'progress-screen') updateProgressScreen();
+                if (screenId === 'settings-screen') loadSettings();
+            }
+        }
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navigateTo(button.dataset.screen);
+            });
+        });
+
+        // --- Speech Synthesis ---
+        const synth = window.speechSynthesis;
+        function speak(text, lang = 'ar-SA') { // Default to Arabic for names
+            if (synth.speaking) {
+                console.error('SpeechSynthesis.speaking');
+                return;
+            }
+            if (text !== '') {
+                const utterThis = new SpeechSynthesisUtterance(text);
+                utterThis.onend = function (event) {
+                    // console.log('SpeechSynthesisUtterance.onend');
+                }
+                utterThis.onerror = function (event) {
+                    console.error('SpeechSynthesisUtterance.onerror', event);
+                    showToast('Speech synthesis error. Your browser might not support it or the selected voice.', 'error');
+                }
+                utterThis.lang = lang;
+                // utterThis.pitch = 1;
+                // utterThis.rate = 0.8;
+                synth.speak(utterThis);
+            }
+        }
+
+        // --- Names List Screen ---
+        const namesListContainer = document.getElementById('names-list-container');
+        const listFilterType = document.getElementById('listFilterType');
+        const listLanguageSelect = document.getElementById('listLanguage');
+
+        async function loadNamesList() {
+            const filterType = listFilterType.value;
+            const lang = listLanguageSelect.value;
+            currentLanguage = lang; // Update global language for consistency
+
+            namesListContainer.innerHTML = '<p>Loading names...</p>';
+            try {
+                let namesToDisplay = allNamesData;
+                if (filterType !== 'all') {
+                    namesToDisplay = allNamesData.filter(name => name.type === filterType);
+                }
+
+                if (namesToDisplay.length === 0) {
+                    namesListContainer.innerHTML = '<p>No names found for this filter.</p>';
+                    return;
+                }
+
+                namesListContainer.innerHTML = namesToDisplay.map(name => `
+                    <div class="name-card">
+                        <div class="arabic-name">${name.arabic}</div>
+                        <div class="transliteration">${name.transliteration}</div>
+                        <div class="translation"><strong>Translation (${lang.toUpperCase()}):</strong> ${name[lang] || 'N/A'}</div>
+                        <div class="significance"><strong>Significance (${lang.toUpperCase()}):</strong> ${name['significance_' + lang] || name.significance_en || 'N/A'}</div>
+                        <div class="actions">
+                            <button class="icon-button" onclick="speak('${name.arabic}', 'ar-SA')" title="Pronounce Name">🔊</button>
+                            <!-- Add more actions like 'Add to SRS review' or 'View details' if needed -->
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Error loading names list:", error);
+                namesListContainer.innerHTML = '<p>Error loading names. Please try again.</p>';
+                showToast('Error loading names.', 'error');
+            }
+        }
+        listFilterType.addEventListener('change', loadNamesList);
+        listLanguageSelect.addEventListener('change', loadNamesList);
+        
+        // --- Match Game ---
+        const matchGameArea = document.getElementById('match-game-area');
+        const matchGameFeedback = document.getElementById('match-game-feedback');
+        const nextMatchQuestionBtn = document.getElementById('next-match-question');
+        let currentMatchQuestion = null;
+
+        async function setupMatchGame() {
+            matchGameFeedback.textContent = '';
+            nextMatchQuestionBtn.style.display = 'none';
+            if (allNamesData.length < 4) {
+                matchGameArea.innerHTML = "<p>Not enough names loaded to start the game. Add at least 4 names.</p>";
+                return;
+            }
+
+            const namesForGame = shuffleArray([...allNamesData]).slice(0, 4); // Use 4 options
+            if (namesForGame.length === 0) {
+                 matchGameArea.innerHTML = "<p>No names available for the game.</p>";
+                 return;
+            }
+            currentMatchQuestion = namesForGame[0]; // The name to match
+
+            const lang = currentLanguage;
+            matchGameArea.innerHTML = `
+                <p class="quiz-question">Match the Arabic name: <strong class="arabic-text" style="font-size:1.5em;">${currentMatchQuestion.arabic}</strong> (${currentMatchQuestion.transliteration})</p>
+                <div class="game-options">
+                    ${namesForGame.map(name => `
+                        <button data-id="${name.id}">${name[lang] || name.en}</button>
+                    `).join('')}
+                </div>
+            `;
+
+            matchGameArea.querySelectorAll('.game-options button').forEach(button => {
+                button.addEventListener('click', handleMatchAnswer);
+            });
+        }
+
+        function handleMatchAnswer(event) {
+            const selectedId = parseInt(event.target.dataset.id);
+            const correctId = currentMatchQuestion.id;
+            const buttons = matchGameArea.querySelectorAll('.game-options button');
+
+            buttons.forEach(btn => {
+                btn.disabled = true; // Disable all buttons after an answer
+                const btnId = parseInt(btn.dataset.id);
+                if (btnId === correctId) {
+                    btn.classList.add('correct');
+                } else if (btnId === selectedId && selectedId !== correctId) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            if (selectedId === correctId) {
+                matchGameFeedback.textContent = 'Correct!';
+                matchGameFeedback.style.color = 'var(--success-color)';
+                updateSrsData(currentMatchQuestion.id, true);
+            } else {
+                matchGameFeedback.textContent = `Incorrect. The correct answer was "${currentMatchQuestion[currentLanguage] || currentMatchQuestion.en}".`;
+                matchGameFeedback.style.color = 'var(--error-color)';
+                updateSrsData(currentMatchQuestion.id, false);
+            }
+            nextMatchQuestionBtn.style.display = 'inline-block';
+        }
+        nextMatchQuestionBtn.addEventListener('click', setupMatchGame);
+
+        // --- Memory Game ---
+        const memoryGridContainer = document.getElementById('memory-grid-container');
+        const startMemoryGameBtn = document.getElementById('startMemoryGameBtn');
+        const memoryGameTypeSelect = document.getElementById('memoryGameType');
+        const memoryPairCountSelect = document.getElementById('memoryPairCount');
+        const memoryGameStatus = document.getElementById('memory-game-status');
+
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let totalPairs = 0;
+
+        startMemoryGameBtn.addEventListener('click', async () => {
+            const nameType = memoryGameTypeSelect.value;
+            totalPairs = parseInt(memoryPairCountSelect.value);
+            
+            let sourceNames = allNamesData.filter(name => name.type === nameType);
+            if (sourceNames.length < totalPairs) {
+                memoryGameStatus.textContent = `Not enough ${nameType} names for ${totalPairs} pairs. Need at least ${totalPairs}.`;
+                return;
+            }
+
+            sourceNames = shuffleArray(sourceNames).slice(0, totalPairs);
+            memoryCards = [];
+            sourceNames.forEach(name => {
+                memoryCards.push({ id: name.id, type: 'name', content: name.arabic, matchId: name.id, isFlipped: false, isMatched: false, isArabic: true });
+                memoryCards.push({ id: name.id, type: 'meaning', content: name[currentLanguage] || name.en, matchId: name.id, isFlipped: false, isMatched: false, isArabic: false });
+            });
+
+            memoryCards = shuffleArray(memoryCards);
+            renderMemoryGrid();
+            matchedPairs = 0;
+            memoryGameStatus.textContent = `Pairs matched: 0 / ${totalPairs}`;
+        });
+
+        function renderMemoryGrid() {
+            memoryGridContainer.innerHTML = '';
+            memoryCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                if (card.isFlipped) cardElement.classList.add('flipped');
+                if (card.isMatched) cardElement.classList.add('matched');
+                cardElement.dataset.index = index;
+
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('card-content');
+                if (card.isArabic) contentElement.classList.add('arabic-text-small');
+                contentElement.textContent = card.content;
+                
+                cardElement.appendChild(contentElement);
+                cardElement.addEventListener('click', () => handleMemoryCardClick(index));
+                memoryGridContainer.appendChild(cardElement);
+            });
+        }
+
+        function handleMemoryCardClick(index) {
+            const clickedCard = memoryCards[index];
+            if (clickedCard.isFlipped || clickedCard.isMatched || flippedCards.length === 2) {
+                return;
+            }
+
+            clickedCard.isFlipped = true;
+            flippedCards.push(clickedCard);
+            renderMemoryGrid(); // Re-render to show flipped state
+
+            if (flippedCards.length === 2) {
+                setTimeout(checkMemoryMatch, 1000);
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.matchId === card2.matchId && card1.type !== card2.type) {
+                card1.isMatched = true;
+                card2.isMatched = true;
+                matchedPairs++;
+                memoryGameStatus.textContent = `Pairs matched: ${matchedPairs} / ${totalPairs}`;
+                updateSrsData(card1.matchId, true); // Count as a correct review
+                if (matchedPairs === totalPairs) {
+                    memoryGameStatus.textContent = `Congratulations! You found all ${totalPairs} pairs!`;
+                    showToast('Memory Game Completed!', 'success');
+                }
+            } else {
+                card1.isFlipped = false;
+                card2.isFlipped = false;
+                // Optionally, penalize SRS for mismatch if desired
+            }
+            flippedCards = [];
+            renderMemoryGrid();
+        }
+
+        // --- Quiz Game (Meaning to Name) ---
+        const quizGameArea = document.getElementById('quiz-game-area');
+        const quizGameFeedback = document.getElementById('quiz-game-feedback');
+        const nextQuizQuestionBtn = document.getElementById('next-quiz-question');
+        let currentQuizQuestion = null;
+
+        async function setupQuizGame() {
+            quizGameFeedback.textContent = '';
+            nextQuizQuestionBtn.style.display = 'none';
+            if (allNamesData.length < 4) {
+                quizGameArea.innerHTML = "<p>Not enough names loaded to start the quiz. Add at least 4 names.</p>";
+                return;
+            }
+
+            const namesForQuiz = shuffleArray([...allNamesData]).slice(0, 4); // 1 correct, 3 distractors
+            if (namesForQuiz.length === 0) {
+                 quizGameArea.innerHTML = "<p>No names available for the quiz.</p>";
+                 return;
+            }
+            currentQuizQuestion = namesForQuiz[0]; // The name whose meaning is the question
+
+            const lang = currentLanguage;
+            quizGameArea.innerHTML = `
+                <p class="quiz-question">Which name means: <strong style="color: var(--gold-accent);">${currentQuizQuestion[lang] || currentQuizQuestion.en}</strong>?</p>
+                <div class="game-options">
+                    ${namesForQuiz.map(name => `
+                        <button data-id="${name.id}" class="arabic-text">${name.arabic} (${name.transliteration})</button>
+                    `).join('')}
+                </div>
+            `;
+
+            quizGameArea.querySelectorAll('.game-options button').forEach(button => {
+                button.addEventListener('click', handleQuizAnswer);
+            });
+        }
+
+        function handleQuizAnswer(event) {
+            const selectedId = parseInt(event.target.dataset.id);
+            const correctId = currentQuizQuestion.id;
+            const buttons = quizGameArea.querySelectorAll('.game-options button');
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                const btnId = parseInt(btn.dataset.id);
+                if (btnId === correctId) {
+                    btn.classList.add('correct');
+                } else if (btnId === selectedId && selectedId !== correctId) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            if (selectedId === correctId) {
+                quizGameFeedback.textContent = 'Correct!';
+                quizGameFeedback.style.color = 'var(--success-color)';
+                updateSrsData(currentQuizQuestion.id, true);
+            } else {
+                quizGameFeedback.textContent = `Incorrect. The correct name is ${currentQuizQuestion.arabic}.`;
+                quizGameFeedback.style.color = 'var(--error-color)';
+                updateSrsData(currentQuizQuestion.id, false);
+            }
+            nextQuizQuestionBtn.style.display = 'inline-block';
+        }
+        nextQuizQuestionBtn.addEventListener('click', setupQuizGame);
+
+        // --- SRS (Spaced Repetition System) ---
+        const srsReviewArea = document.getElementById('srs-review-area');
+        const srsShowAnswerBtn = document.getElementById('srs-show-answer');
+        const srsCorrectBtn = document.getElementById('srs-correct');
+        const srsIncorrectBtn = document.getElementById('srs-incorrect');
+        let currentSrsItem = null;
+
+        async function loadSrsReviewItems() {
+            const now = Date.now();
+            const dueItems = allNamesData.filter(name => name.srs_data && name.srs_data.due_date <= now)
+                                       .sort((a, b) => a.srs_data.due_date - b.srs_data.due_date);
+
+            if (dueItems.length === 0) {
+                srsReviewArea.innerHTML = "<p>No items currently due for review. Well done!</p>";
+                srsShowAnswerBtn.style.display = 'none';
+                srsCorrectBtn.style.display = 'none';
+                srsIncorrectBtn.style.display = 'none';
+                currentSrsItem = null;
+                return;
+            }
+
+            currentSrsItem = dueItems[0];
+            srsReviewArea.innerHTML = `
+                <p>Review the name:</p>
+                <div class="name-card">
+                    <div class="arabic-name">${currentSrsItem.arabic}</div>
+                    <div class="transliteration">${currentSrsItem.transliteration}</div>
+                    <div id="srs-answer-area" style="display:none;">
+                        <div class="translation"><strong>Translation (${currentLanguage.toUpperCase()}):</strong> ${currentSrsItem[currentLanguage] || 'N/A'}</div>
+                        <div class="significance"><strong>Significance (${currentLanguage.toUpperCase()}):</strong> ${currentSrsItem['significance_' + currentLanguage] || currentSrsItem.significance_en || 'N/A'}</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('srs-answer-area').style.display = 'none';
+            srsShowAnswerBtn.style.display = 'inline-block';
+            srsCorrectBtn.style.display = 'none';
+            srsIncorrectBtn.style.display = 'none';
+        }
+
+        srsShowAnswerBtn.addEventListener('click', () => {
+            if (currentSrsItem) {
+                document.getElementById('srs-answer-area').style.display = 'block';
+                srsShowAnswerBtn.style.display = 'none';
+                srsCorrectBtn.style.display = 'inline-block';
+                srsIncorrectBtn.style.display = 'inline-block';
+            }
+        });
+
+        srsCorrectBtn.addEventListener('click', () => {
+            if (currentSrsItem) {
+                updateSrsData(currentSrsItem.id, true);
+                showToast(`"${currentSrsItem.transliteration}" marked as correct.`, 'success');
+                loadSrsReviewItems(); // Load next item
+            }
+        });
+        srsIncorrectBtn.addEventListener('click', () => {
+            if (currentSrsItem) {
+                updateSrsData(currentSrsItem.id, false);
+                showToast(`"${currentSrsItem.transliteration}" marked as incorrect. Review again soon.`, 'info');
+                loadSrsReviewItems(); // Load next item
+            }
+        });
+
+        async function updateSrsData(nameId, isCorrect) {
+            const name = allNamesData.find(n => n.id === nameId);
+            if (!name || !name.srs_data) return;
+
+            const srs = name.srs_data;
+            const quality = isCorrect ? 4 : 1; // Simplified quality score (0-5 scale, 4=correct, 1=incorrect)
+
+            if (quality >= 3) { // Correct
+                if (srs.interval === 0) {
+                    srs.interval = 1; // 1 day
+                } else if (srs.interval === 1) {
+                    srs.interval = 6; // 6 days
+                } else {
+                    srs.interval = Math.round(srs.interval * srs.ease_factor);
+                }
+                srs.correct_streak = (srs.correct_streak || 0) + 1;
+            } else { // Incorrect
+                srs.interval = 0; // Review again in the same session or next day
+                srs.correct_streak = 0;
+            }
+            
+            // Max interval (e.g., 1 year)
+            srs.interval = Math.min(srs.interval, 365); 
+
+            srs.ease_factor = Math.max(1.3, srs.ease_factor + 0.1 * (quality - 3)); // SM-2 like adjustment
+            srs.due_date = Date.now() + srs.interval * 24 * 60 * 60 * 1000; // Convert days to ms
+            srs.last_reviewed = Date.now();
+
+            try {
+                await updateObject(NAMES_STORE, name);
+                // Update in-memory cache
+                const index = allNamesData.findIndex(n => n.id === nameId);
+                if (index !== -1) allNamesData[index] = name;
+                updateProgressScreen(); // Refresh progress display
+            } catch (error) {
+                console.error("Error updating SRS data:", error);
+                showToast('Error saving review progress.', 'error');
+            }
+        }
+
+        // --- Progress Screen ---
+        function updateProgressScreen() {
+            if (!allNamesData || allNamesData.length === 0) return;
+
+            const allahNames = allNamesData.filter(n => n.type === 'allah');
+            const prophetNames = allNamesData.filter(n => n.type === 'prophet');
+
+            document.getElementById('allah-names-total').textContent = allahNames.length;
+            document.getElementById('prophet-names-total').textContent = prophetNames.length;
+
+            // Define "mastered" as e.g. interval > 30 days or correct_streak > 5
+            const masteredThresholdInterval = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+            const masteredThresholdStreak = 5;
+
+            const allahMastered = allahNames.filter(n => n.srs_data && (n.srs_data.interval * 24 * 60 * 60 * 1000 >= masteredThresholdInterval || n.srs_data.correct_streak >= masteredThresholdStreak)).length;
+            const prophetMastered = prophetNames.filter(n => n.srs_data && (n.srs_data.interval * 24 * 60 * 60 * 1000 >= masteredThresholdInterval || n.srs_data.correct_streak >= masteredThresholdStreak)).length;
+            
+            document.getElementById('allah-names-mastered').textContent = allahMastered;
+            document.getElementById('prophet-names-mastered').textContent = prophetMastered;
+
+            const totalNames = allNamesData.length;
+            const totalMastered = allahMastered + prophetMastered;
+            const overallProgress = totalNames > 0 ? Math.round((totalMastered / totalNames) * 100) : 0;
+            
+            const progressBar = document.getElementById('overall-progress-bar');
+            progressBar.style.width = `${overallProgress}%`;
+            progressBar.textContent = `${overallProgress}%`;
+        }
+
+
+        // --- Settings Screen ---
+        const defaultLangSelect = document.getElementById('defaultLanguage');
+        const quizQuestionCountInput = document.getElementById('quizQuestionCount');
+        const backupDataBtn = document.getElementById('backupDataBtn');
+        const restoreFileInput = document.getElementById('restoreFile');
+        const resetAppBtn = document.getElementById('resetAppBtn');
+
+        async function loadSettings() {
+            try {
+                const langSetting = await getObject(SETTINGS_STORE, 'defaultLanguage');
+                if (langSetting) {
+                    defaultLangSelect.value = langSetting.value;
+                    currentLanguage = langSetting.value; // Ensure global var is also set
+                    listLanguageSelect.value = langSetting.value; // Sync list view language
+                }
+                const quizCountSetting = await getObject(SETTINGS_STORE, 'quizQuestionCount');
+                if (quizCountSetting) {
+                    quizQuestionCountInput.value = quizCountSetting.value;
+                }
+            } catch (error) {
+                console.error("Error loading settings:", error);
+            }
+        }
+
+        async function saveSettings() {
+            try {
+                await updateObject(SETTINGS_STORE, { key: 'defaultLanguage', value: defaultLangSelect.value });
+                await updateObject(SETTINGS_STORE, { key: 'quizQuestionCount', value: parseInt(quizQuestionCountInput.value) });
+                currentLanguage = defaultLangSelect.value; // Update global current language
+                listLanguageSelect.value = currentLanguage; // Sync list view language
+                showToast('Settings saved!', 'success');
+            } catch (error) {
+                console.error("Error saving settings:", error);
+                showToast('Error saving settings.', 'error');
+            }
+        }
+        defaultLangSelect.addEventListener('change', saveSettings);
+        quizQuestionCountInput.addEventListener('change', saveSettings);
+
+        // Backup Data
+        backupDataBtn.addEventListener('click', async () => {
+            try {
+                const backupData = {};
+                backupData[NAMES_STORE] = await getAllObjects(NAMES_STORE);
+                backupData[SETTINGS_STORE] = await getAllObjects(SETTINGS_STORE);
+                backupData[PROGRESS_STORE] = await getAllObjects(PROGRESS_STORE);
+
+                const json = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'beautiful_names_backup.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Data backup successful!', 'success');
+            } catch (error) {
+                console.error('Backup error:', error);
+                showToast('Data backup failed.', 'error');
+            }
+        });
+
+        // Restore Data
+        restoreFileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (!confirm("Restoring data will overwrite all current data. Are you sure you want to continue?")) {
+                    restoreFileInput.value = ''; // Reset file input
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const backupData = JSON.parse(e.target.result);
+                        // Clear existing stores
+                        await clearStore(NAMES_STORE);
+                        await clearStore(SETTINGS_STORE);
+                        await clearStore(PROGRESS_STORE);
+
+                        // Import data
+                        if (backupData[NAMES_STORE]) {
+                            for (const record of backupData[NAMES_STORE]) {
+                                await addObject(NAMES_STORE, record);
+                            }
+                        }
+                        if (backupData[SETTINGS_STORE]) {
+                            for (const record of backupData[SETTINGS_STORE]) {
+                                await addObject(SETTINGS_STORE, record);
+                            }
+                        }
+                         if (backupData[PROGRESS_STORE]) {
+                            for (const record of backupData[PROGRESS_STORE]) {
+                                await addObject(PROGRESS_STORE, record);
+                            }
+                        }
+                        // Reload all data into app state
+                        await loadInitialData(); 
+                        showToast('Data restored successfully! App reloaded.', 'success');
+                        navigateTo('home-screen'); // Go to home
+                    } catch (error) {
+                        console.error('Error restoring data:', error);
+                        showToast('Failed to restore data. Invalid file format or DB error.', 'error');
+                    } finally {
+                        restoreFileInput.value = ''; // Reset file input
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Reset Application
+        resetAppBtn.addEventListener('click', async () => {
+            if (confirm("WARNING: This will delete ALL your data and reset the app to its initial state. This action cannot be undone. Are you sure?")) {
+                try {
+                    await clearStore(NAMES_STORE);
+                    await clearStore(SETTINGS_STORE);
+                    await clearStore(PROGRESS_STORE);
+                    // Mark that initial data needs to be populated again
+                    localStorage.removeItem('appInitialized'); 
+                    await initializeApp(); // Re-initialize
+                    showToast('Application has been reset.', 'success');
+                    navigateTo('home-screen');
+                } catch (error) {
+                    console.error('Error resetting app:', error);
+                    showToast('Failed to reset application.', 'error');
+                }
+            }
+        });
+
+        // --- Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Initialization ---
+        async function populateInitialNames() {
+            try {
+                for (const nameData of INITIAL_NAMES_DATA) {
+                    // Ensure SRS data structure is complete
+                    const srsDefaults = { interval: 0, ease_factor: 2.5, due_date: Date.now(), correct_streak: 0, last_reviewed: null };
+                    nameData.srs_data = { ...srsDefaults, ...(nameData.srs_data || {}) };
+                    await addObject(NAMES_STORE, nameData);
+                }
+                console.log('Initial names populated into DB.');
+            } catch (error) {
+                // This might happen if data already exists (e.g. if add used instead of put and key exists)
+                // Or if there's a transaction error.
+                if (error.name === 'ConstraintError') {
+                     console.warn('Initial names might already exist in DB.');
+                } else {
+                    console.error('Error populating initial names:', error);
+                }
+            }
+        }
+        
+        async function loadInitialData() {
+            try {
+                allNamesData = await getAllObjects(NAMES_STORE);
+                if (allNamesData.length === 0 && !localStorage.getItem('appInitialized')) {
+                    await populateInitialNames();
+                    allNamesData = await getAllObjects(NAMES_STORE);
+                    localStorage.setItem('appInitialized', 'true');
+                    showToast('Welcome! Initial data loaded.', 'success');
+                } else if (allNamesData.length === 0 && localStorage.getItem('appInitialized')) {
+                    // Data was cleared, but app was initialized before. Might need re-population or it's intentional.
+                    // For now, assume if empty, it should be populated if the flag isn't set.
+                    console.log("DB is empty but app was previously initialized. User might have cleared data.");
+                }
+                // Load default language setting
+                const langSetting = await getObject(SETTINGS_STORE, 'defaultLanguage');
+                currentLanguage = langSetting ? langSetting.value : 'en';
+                listLanguageSelect.value = currentLanguage;
+                defaultLangSelect.value = currentLanguage;
+
+                console.log('All names data loaded into memory:', allNamesData.length);
+            } catch (error) {
+                console.error("Error loading all names data from DB:", error);
+                showToast('Error loading application data.', 'error');
+            }
+        }
+
+        async function initializeApp() {
+            try {
+                await initDB();
+                await loadInitialData();
+                navigateTo('home-screen'); // Default screen
+                // Update dynamic elements that depend on data counts
+                updateProgressScreen(); 
+            } catch (error) {
+                console.error('App initialization failed:', error);
+                document.getElementById('main-content').innerHTML = 
+                    '<p class="text-center error-message">Critical error: Could not initialize the application. Please try refreshing or clearing application data in your browser settings.</p>';
+            }
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Names Challenge</title>
+    <meta name="description" content="An offline game to learn Asma ul Husna and Prophet Muhammad Names and their meanings.">
+    <meta name="author" content="Yasin Ullah">
+    <style>
+        /* Basic Reset and Body Styling */
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #e0e0e0; /* Light text */
+            background: linear-gradient(135deg, #0d1a26 0%, #1a3a52 100%); /* Dark futuristic gradient */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Allow scrolling */
+        }
+
+        /* Divine Light Motif */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(100, 149, 237, 0.1) 0%, transparent 60%); /* Subtle light effect */
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        h1, h2, h3 {
+            color: #ffebcd; /* Blanched Almond - soft gold */
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 8px rgba(255, 235, 205, 0.5); /* Soft glow */
+        }
+
+        h1 { font-size: 2.5em; }
+        h2 { font-size: 1.8em; }
+        h3 { font-size: 1.4em; }
+
+        /* Container for main content */
+        .container {
+            background-color: rgba(25, 50, 70, 0.8); /* Semi-transparent dark background */
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            position: relative; /* Needed for absolute positioning of modal/overlays */
+        }
+
+        /* Navigation/Menu */
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .menu button {
+            background: linear-gradient(45deg, #345e7a, #2a4f66);
+            color: #e0e0e0;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            min-width: 150px;
+        }
+
+        .menu button:hover {
+            background: linear-gradient(45deg, #4a7a99, #3a6680);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .menu button:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.5s ease-in-out;
+            text-align: left; /* Align text left within sections */
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* List View */
+        .names-list {
+            /* max-height: 60vh; Limit height to make it scrollable */
+            overflow-y: auto;
+            padding-right: 10px; /* Space for scrollbar */
+        }
+
+        .names-list::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .names-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .names-list::-webkit-scrollbar-thumb {
+            background: #ffebcd;
+            border-radius: 5px;
+        }
+
+        .name-item {
+            background-color: rgba(40, 70, 90, 0.7);
+            border: 1px solid rgba(255, 235, 205, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .name-item:hover {
+             transform: translateY(-3px);
+        }
+
+        .name-item h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: #ffebcd;
+        }
+
+        .name-item p {
+            margin: 5px 0;
+            line-height: 1.6;
+            color: #c0c0c0;
+        }
+
+        .name-item .arabic {
+            font-size: 1.8em;
+            font-family: 'Arial', 'Traditional Arabic', sans-serif; /* Fallback fonts */
+            text-align: right;
+            direction: rtl;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .name-item .meaning {
+            font-style: italic;
+            color: #b0c4de; /* Light steel blue */
+        }
+
+        .name-item .significance {
+            font-size: 0.9em;
+            color: #a0a0a0;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(255, 235, 205, 0.2);
+        }
+
+        .name-item button {
+            background-color: rgba(255, 235, 205, 0.2);
+            color: #ffebcd;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .name-item button:hover {
+            background-color: rgba(255, 235, 205, 0.4);
+        }
+
+        /* Settings View */
+        .settings-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .settings-group {
+            border: 1px solid rgba(255, 235, 205, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .settings-group h4 {
+            margin-top: 0;
+            color: #ffebcd;
+            margin-bottom: 10px;
+        }
+
+        .settings-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #c0c0c0;
+        }
+
+        .settings-group input[type="checkbox"],
+        .settings-group input[type="radio"],
+        .settings-group input[type="number"] {
+            margin-right: 5px;
+        }
+
+        .settings-group input[type="number"] {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #333;
+            color: #e0e0e0;
+            width: 80px;
+        }
+
+        .settings-actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .settings-actions button {
+             background: linear-gradient(45deg, #345e7a, #2a4f66);
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+         .settings-actions button:hover {
+            background: linear-gradient(45deg, #4a7a99, #3a6680);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Progress View */
+        .progress-stats {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .progress-stats p {
+            font-size: 1.1em;
+            margin: 8px 0;
+            color: #c0c0c0;
+        }
+
+        .progress-stats strong {
+            color: #ffebcd;
+        }
+
+        .srs-status-list {
+            max-height: 40vh;
+            overflow-y: auto;
+            padding-right: 10px;
+            border-top: 1px solid rgba(255, 235, 205, 0.2);
+            margin-top: 20px;
+            padding-top: 10px;
+        }
+
+         .srs-status-list::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .srs-status-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .srs-status-list::-webkit-scrollbar-thumb {
+            background: #ffebcd;
+            border-radius: 5px;
+        }
+
+        .srs-item {
+            background-color: rgba(50, 80, 100, 0.5);
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .srs-item span {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .srs-item .srs-level {
+            font-weight: bold;
+            color: #ffebcd;
+        }
+
+        .backup-restore-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 235, 205, 0.2);
+            text-align: center;
+        }
+
+        .backup-restore-section button {
+            margin: 0 10px;
+             background: linear-gradient(45deg, #345e7a, #2a4f66);
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+         .backup-restore-section button:hover {
+            background: linear-gradient(45deg, #4a7a99, #3a6680);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .backup-restore-section input[type="file"] {
+            display: none; /* Hide file input */
+        }
+
+        /* Game Views (General) */
+        .game-area {
+            text-align: center;
+        }
+
+        .game-info {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #c0c0c0;
+        }
+
+        .game-info strong {
+             color: #ffebcd;
+        }
+
+        .game-feedback {
+            min-height: 1.5em;
+            margin-top: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .feedback-correct { color: #90ee90; } /* Light green */
+        .feedback-incorrect { color: #ff6347; } /* Tomato */
+
+        .game-actions {
+            margin-top: 20px;
+        }
+
+        .game-actions button {
+             background: linear-gradient(45deg, #345e7a, #2a4f66);
+            color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin: 0 5px;
+        }
+        .game-actions button:hover {
+            background: linear-gradient(45deg, #4a7a99, #3a6680);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Quiz Game */
+        .quiz-question {
+            margin-bottom: 20px;
+        }
+
+        .quiz-question p {
+            font-size: 1.3em;
+            color: #b0c4de;
+            margin-bottom: 15px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-options button {
+            background-color: rgba(60, 90, 110, 0.7);
+            border: 1px solid rgba(255, 235, 205, 0.3);
+            color: #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quiz-options button:hover {
+            background-color: rgba(80, 110, 130, 0.8);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .quiz-options button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .quiz-options button.correct {
+            background-color: #4CAF50; /* Green */
+            border-color: #8bc34a;
+            color: white;
+        }
+
+        .quiz-options button.incorrect {
+            background-color: #f44336; /* Red */
+            border-color: #ef9a9a;
+            color: white;
+        }
+
+
+        /* Memory Game */
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .memory-card {
+            background-color: rgba(60, 90, 110, 0.7);
+            border: 1px solid rgba(255, 235, 205, 0.3);
+            border-radius: 8px;
+            height: 120px; /* Fixed height for cards */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1em;
+            color: transparent; /* Hide text initially */
+            user-select: none;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease-in-out, background-color 0.3s ease;
+            position: relative;
+        }
+
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+            background-color: rgba(80, 110, 130, 0.8);
+            color: #e0e0e0; /* Show text when flipped */
+        }
+
+         .memory-card.matched {
+            background-color: rgba(76, 175, 80, 0.5); /* Greenish when matched */
+            border-color: rgba(139, 195, 74, 0.5);
+            color: #e0e0e0;
+            cursor: default;
+        }
+
+        .memory-card .card-inner {
+             position: absolute;
+             width: 100%;
+             height: 100%;
+             text-align: center;
+             backface-visibility: hidden;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             padding: 5px;
+             box-sizing: border-box;
+             word-break: break-word; /* Prevent overflow */
+             overflow: hidden;
+        }
+
+        .memory-card .card-front {
+             background-color: rgba(60, 90, 110, 0.7); /* Back of the card */
+             border-radius: 8px;
+             width: 100%;
+             height: 100%;
+        }
+
+        .memory-card.flipped .card-front {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card .card-back {
+             background-color: rgba(80, 110, 130, 0.8); /* Front of the card (content) */
+             color: #e0e0e0;
+             transform: rotateY(180deg);
+             border-radius: 8px;
+             width: 100%;
+             height: 100%;
+        }
+
+         .memory-card.flipped .card-back {
+            transform: rotateY(0deg);
+        }
+
+        .memory-card .arabic {
+            font-size: 1.4em;
+            font-family: 'Arial', 'Traditional Arabic', sans-serif;
+        }
+
+        .memory-card .meaning {
+            font-size: 0.9em;
+        }
+
+
+        /* Match Game */
+        .match-board {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .match-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .match-item {
+            background-color: rgba(60, 90, 110, 0.7);
+            border: 1px solid rgba(255, 235, 205, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            user-select: none;
+            text-align: center;
+        }
+
+        .match-item:hover:not(.matched):not(.selected) {
+             background-color: rgba(80, 110, 130, 0.8);
+             transform: translateY(-2px);
+        }
+
+        .match-item.selected {
+            background-color: rgba(255, 235, 205, 0.3);
+            border-color: #ffebcd;
+            box-shadow: 0 0 10px rgba(255, 235, 205, 0.5);
+        }
+
+         .match-item.matched {
+            background-color: rgba(76, 175, 80, 0.5); /* Greenish when matched */
+            border-color: rgba(139, 195, 74, 0.5);
+            color: #e0e0e0;
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        .match-item .arabic {
+            font-size: 1.6em;
+             font-family: 'Arial', 'Traditional Arabic', sans-serif;
+             text-align: right;
+             direction: rtl;
+        }
+
+        .match-item .translation {
+            font-size: 1.1em;
+        }
+
+
+        /* Modal/Overlay for Info/Results */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: rgba(30, 60, 80, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            color: #e0e0e0;
+            position: relative;
+            animation: scaleIn 0.3s ease-out;
+        }
+
+         @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+
+        .modal-content h3 {
+            color: #ffebcd;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .modal-content .arabic {
+             font-size: 2em;
+            font-family: 'Arial', 'Traditional Arabic', sans-serif;
+            text-align: center;
+            direction: rtl;
+            margin: 15px 0;
+            color: #fff;
+        }
+
+         .modal-content .meaning {
+            font-style: italic;
+            color: #b0c4de;
+            margin-bottom: 15px;
+        }
+
+        .modal-content .significance {
+            font-size: 0.95em;
+             color: #a0a0a0;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 235, 205, 0.2);
+        }
+
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5em;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: #ffebcd;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #a0a0a0;
+            text-align: center;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+            .menu { flex-direction: column; gap: 10px; }
+            .menu button { width: 100%; min-width: unset; }
+            .quiz-options { grid-template-columns: 1fr; }
+            .match-board { grid-template-columns: 1fr; gap: 10px; }
+            .memory-board { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+             .memory-card { height: 100px; font-size: 0.9em; }
+             .memory-card .arabic { font-size: 1.2em; }
+             .memory-card .meaning { font-size: 0.8em; }
+             .name-item .arabic { font-size: 1.5em; }
+             .match-item .arabic { font-size: 1.4em; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Beautiful Names Challenge</h1>
+
+        <!-- Navigation Menu -->
+        <div class="menu">
+            <button id="btn-home">Home</button>
+            <button id="btn-list">Names List</button>
+            <button id="btn-quiz">Quiz Game</button>
+            <button id="btn-memory">Memory Game</button>
+            <button id="btn-match">Match Game</button>
+            <button id="btn-progress">Progress & Backup</button>
+            <button id="btn-settings">Settings</button>
+        </div>
+
+        <!-- Content Sections -->
+        <div id="section-home" class="content-section active">
+            <h2>Welcome</h2>
+            <p>Learn the beautiful names of Allah (Asma ul Husna) and Prophet Muhammad (peace be upon him) and their profound meanings through engaging offline games.</p>
+            <p>Navigate using the menu above to explore names, play games, track your progress, and customize settings.</p>
+             <p>This app is designed to work completely offline once loaded.</p>
+        </div>
+
+        <div id="section-list" class="content-section">
+            <h2>Names List</h2>
+            <div class="names-list">
+                <!-- Names will be loaded here by JS -->
+                <p class="text-center">Loading names...</p>
+            </div>
+        </div>
+
+        <div id="section-quiz" class="content-section">
+            <h2>Quiz Game</h2>
+            <div class="game-area">
+                <div class="game-info">
+                    Question <span id="quiz-current">0</span> of <span id="quiz-total">0</span> | Score: <span id="quiz-score">0</span>
+                </div>
+                <div class="quiz-question">
+                    <!-- Question (Meaning) will be loaded here -->
+                    <p id="quiz-meaning">Loading question...</p>
+                </div>
+                <div id="quiz-options" class="quiz-options">
+                    <!-- Options (Names) will be loaded here -->
+                </div>
+                 <div id="quiz-feedback" class="game-feedback"></div>
+                 <div class="game-actions">
+                     <button id="quiz-next-btn" class="hidden">Next Question</button>
+                     <button id="quiz-start-btn">Start Quiz</button>
+                 </div>
+            </div>
+        </div>
+
+        <div id="section-memory" class="content-section">
+            <h2>Memory Game</h2>
+             <div class="game-area">
+                 <div class="game-info">
+                     Pairs Found: <span id="memory-pairs">0</span> | Attempts: <span id="memory-attempts">0</span>
+                 </div>
+                 <div id="memory-board" class="memory-board">
+                     <!-- Memory cards will be loaded here -->
+                 </div>
+                 <div id="memory-feedback" class="game-feedback"></div>
+                 <div class="game-actions">
+                     <button id="memory-start-btn">Start Memory Game</button>
+                 </div>
+             </div>
+        </div>
+
+         <div id="section-match" class="content-section">
+            <h2>Match Game</h2>
+             <div class="game-area">
+                 <div class="game-info">
+                     Matches Found: <span id="match-pairs">0</span> / <span id="match-total-pairs">0</span>
+                 </div>
+                 <div id="match-board" class="match-board">
+                     <div id="match-column-arabic" class="match-column">
+                         <!-- Arabic names here -->
+                     </div>
+                      <div id="match-column-translation" class="match-column">
+                         <!-- Translations here -->
+                     </div>
+                 </div>
+                 <div id="match-feedback" class="game-feedback"></div>
+                 <div class="game-actions">
+                     <button id="match-start-btn">Start Match Game</button>
+                 </div>
+             </div>
+        </div>
+
+
+        <div id="section-progress" class="content-section">
+            <h2>Progress & Backup</h2>
+            <div class="progress-stats">
+                <h3>Overall Progress</h3>
+                <p>Total Quizzes Played: <strong id="progress-total-quizzes">0</strong></p>
+                <p>Total Quiz Questions Correct: <strong id="progress-total-correct">0</strong></p>
+                <p>Total Quiz Questions Incorrect: <strong id="progress-total-incorrect">0</strong></p>
+                <p>Last Played: <strong id="progress-last-played">Never</strong></p>
+            </div>
+
+            <div class="srs-status">
+                 <h3>Learning Status (SRS)</h3>
+                 <div id="srs-status-list" class="srs-status-list">
+                     <!-- SRS status for names will load here -->
+                     <p class="text-center">Loading SRS data...</p>
+                 </div>
+            </div>
+
+            <div class="backup-restore-section">
+                <h3>Data Management</h3>
+                <button id="btn-backup">Backup Data</button>
+                <button id="btn-restore">Restore Data</button>
+                <input type="file" id="restore-file-input" accept="application/json">
+                <p id="restore-status"></p>
+            </div>
+        </div>
+
+        <div id="section-settings" class="content-section">
+            <h2>Settings</h2>
+            <div class="settings-form">
+                <div class="settings-group">
+                    <h4>Quiz Settings</h4>
+                    <label>Quiz Languages:</label>
+                    <div>
+                        <input type="checkbox" id="setting-lang-english" value="english"> <label for="setting-lang-english" style="display: inline-block;">English</label><br>
+                        <input type="checkbox" id="setting-lang-urdu" value="urdu"> <label for="setting-lang-urdu" style="display: inline-block;">Urdu</label><br>
+                        <input type="checkbox" id="setting-lang-pashto" value="pashto"> <label for="setting-lang-pashto" style="display: inline-block;">Pashto</label>
+                    </div>
+                     <label style="margin-top: 15px;">Include Names:</label>
+                    <div>
+                        <input type="checkbox" id="setting-set-allah" value="allah"> <label for="setting-set-allah" style="display: inline-block;">Asma ul Husna</label><br>
+                        <input type="checkbox" id="setting-set-prophet" value="prophet"> <label for="setting-set-prophet" style="display: inline-block;">Prophet Muhammad (PBUH)</label>
+                    </div>
+                    <label style="margin-top: 15px;" for="setting-quiz-count">Number of Quiz Questions:</label>
+                    <input type="number" id="setting-quiz-count" value="10" min="5" max="100">
+                </div>
+
+                 <div class="settings-group">
+                     <h4>Theme Settings (Basic)</h4>
+                     <label>Select Theme:</label>
+                     <div>
+                         <input type="radio" id="theme-dark" name="theme" value="dark" checked> <label for="theme-dark" style="display: inline-block;">Dark (Default)</label><br>
+                         <!-- Add more themes later if desired -->
+                     </div>
+                 </div>
+
+                <div class="settings-actions">
+                    <button id="btn-save-settings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal for Name Details -->
+    <div id="name-detail-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close">×</span>
+            <h3 id="modal-name-title">Name Details</h3>
+            <p class="arabic" id="modal-name-arabic"></p>
+            <p id="modal-name-translation"></p>
+            <p class="meaning" id="modal-name-meaning"></p>
+            <p class="significance" id="modal-name-significance"></p>
+            <button id="modal-play-audio">Play Pronunciation</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        Developed by Yasin Ullah (Pakistani) | Offline Learning App
+    </div>
+
+    <script>
+        // --- Data ---
+        // Placeholder data structure. Full data needs to be populated.
+        // Each name object includes Arabic, English, Urdu, Pashto, Meaning, Significance, and SRS data.
+        // SRS data is { level: 0-5, interval: days, ease: 1.3-2.5, lastReview: Date }
+        // level 0: New, level 1: Learning, level 2+: Reviewing
+        const appData = {
+            names: [
+                // Asma ul Husna (99 Names of Allah) - COMPLETE Data
+                { id: 'allah-1', type: 'allah', arabic: 'الرَّحْمَن', english: 'The Most Compassionate', urdu: 'الرَّحمٰن', pashto: 'الرحمن', meaning: 'The One who has great mercy for all creation.', significance: 'His mercy encompasses everything, extending to both believers and disbelievers in this world.', audioRef: '' },
+                { id: 'allah-2', type: 'allah', arabic: 'الرَّحِيم', english: 'The Most Merciful', urdu: 'الرَّحیم', pashto: 'الرحیم', meaning: 'The One who has great mercy specifically for the believers in the Hereafter.', significance: 'His mercy is specifically for those who follow His guidance and believe in Him.', audioRef: '' },
+                { id: 'allah-3', type: 'allah', arabic: 'الْمَلِك', english: 'The King', urdu: 'الْمَلِک', pashto: 'الملک', meaning: 'The Sovereign Lord, the One with absolute dominion over all things.', significance: 'He is the ultimate ruler, possessing all authority and power.', audioRef: '' },
+                { id: 'allah-4', type: 'allah', arabic: 'الْقُدُّوس', english: 'The Holy', urdu: 'الْقُدُّوس', pashto: 'القدوس', meaning: 'The One who is pure, sacred, and free from all imperfections, faults, and limitations.', significance: 'He is utterly transcendent and beyond human comprehension or flaws.', audioRef: '' },
+                { id: 'allah-5', type: 'allah', arabic: 'السَّلَام', english: 'The Source of Peace', urdu: 'السَّلام', pashto: 'السلام', meaning: 'The One who is free from all defects and grants peace, security, and safety.', significance: 'He is the origin of all peace and the guarantor of safety for His creation.', audioRef: '' },
+                { id: 'allah-6', type: 'allah', arabic: 'الْمُؤْمِن', english: 'The Giver of Faith', urdu: 'الْمُؤمِن', pashto: 'المؤمن', meaning: 'The One who confirms the truth, grants security, and inspires faith in hearts.', significance: 'He assures safety and confirms His promises, granting belief and security.', audioRef: '' },
+                { id: 'allah-7', type: 'allah', arabic: 'الْمُهَيْمِن', english: 'The Guardian', urdu: 'الْمُھَیمِن', pashto: 'المهيمن', meaning: 'The Overseer, the Protector, the Witness, the One who has full control and supervision.', significance: 'He watches over and protects His creation, knowing all things.', audioRef: '' },
+                { id: 'allah-8', type: 'allah', arabic: 'الْعَزِيز', english: 'The Almighty', urdu: 'الْعَزِیز', pashto: 'العزیز', meaning: 'The Mighty, the Strong, the Invincible, the One whose power is absolute and cannot be overcome.', significance: 'He possesses ultimate power and honor, dominant over all.', audioRef: '' },
+                { id: 'allah-9', type: 'allah', arabic: 'الْجَبَّار', english: 'The Compeller', urdu: 'الْجَبَّار', pashto: 'الجبار', meaning: 'The Restorer, the One who compels wills and repairs broken things.', significance: 'He has the power to enforce His will and mend what is broken.', audioRef: '' },
+                { id: 'allah-10', type: 'allah', arabic: 'الْمُتَكَبِّر', english: 'The Supreme', urdu: 'الْمُتَکَبِّر', pashto: 'المتکبر', meaning: 'The Most Proud, the Possessor of all greatness, the One who is above all creation.', significance: 'He is the only One truly deserving of greatness and pride.', audioRef: '' },
+                { id: 'allah-11', type: 'allah', arabic: 'الْخَالِق', english: 'The Creator', urdu: 'الْخَالِق', pashto: 'الخالق', meaning: 'The Maker, the Originator, the One who creates things from nothing.', significance: 'He is the sole architect of existence.', audioRef: '' },
+                { id: 'allah-12', type: 'allah', arabic: 'الْبَارِئ', english: 'The Evolver', urdu: 'الْبَارِئ', pashto: 'البارئ', meaning: 'The Maker, the One who creates from pre-existing matter or brings things into being distinctly.', significance: 'He is the one who designs and fashions creation.', audioRef: '' },
+                { id: 'allah-13', type: 'allah', arabic: 'الْمُصَوِّر', english: 'The Fashioner', urdu: 'الْمُصَوِّر', pashto: 'المصور', meaning: 'The Shaper, the Designer, the One who gives form and shape to His creation.', significance: 'He designs and perfects the appearance of all things.', audioRef: '' },
+                { id: 'allah-14', type: 'allah', arabic: 'الْغَفَّار', english: 'The Forgiver', urdu: 'الْغَفَّار', pashto: 'الغفار', meaning: 'The Repeatedly Forgiving, the One who forgives sins again and again.', significance: 'He is ever-ready to forgive those who seek His forgiveness.', audioRef: '' },
+                { id: 'allah-15', type: 'allah', arabic: 'الْقَهَّار', english: 'The Subduer', urdu: 'الْقَھَّار', pashto: 'القهار', meaning: 'The Dominant, the One who overcomes all and to whom all must submit.', significance: 'He has power to subdue anything and everything.', audioRef: '' },
+                { id: 'allah-16', type: 'allah', arabic: 'الْوَهَّاب', english: 'The Bestower', urdu: 'الْوَھَّاب', pashto: 'الوهاب', meaning: 'The Giver of Gifts, the One who grants favors and blessings freely and constantly.', significance: 'He gives generously without expecting anything in return.', audioRef: '' },
+                { id: 'allah-17', type: 'allah', arabic: 'الرَّزَّاق', english: 'The Provider', urdu: 'الرَّزَّاق', pashto: 'الرزاق', meaning: 'The Sustainer, the One who provides sustenance to all creation.', significance: 'He is the sole source of provision for all beings.', audioRef: '' },
+                { id: 'allah-18', type: 'allah', arabic: 'الْفَتَّاح', english: 'The Opener', urdu: 'الْفَتَّاح', pashto: 'الفتاح', meaning: 'The Granter of Success, the Opener of doors (of mercy, sustenance, etc.), the Judge.', significance: 'He opens the way to success and resolves disputes.', audioRef: '' },
+                { id: 'allah-19', type: 'allah', arabic: 'الْعَلِيم', english: 'The All-Knowing', urdu: 'الْعَلِیم', pashto: 'العلیم', meaning: 'The Omniscient, the One who knows everything, seen and unseen, past, present, and future.', significance: 'His knowledge is absolute and encompasses all things.', audioRef: '' },
+                { id: 'allah-20', type: 'allah', arabic: 'الْقَابِض', english: 'The Constrictor', urdu: 'الْقَابِض', pashto: 'القابض', meaning: 'The Withholder, the One who withholds sustenance or decreases provisions.', significance: 'He controls the flow of sustenance and life.', audioRef: '' },
+                { id: 'allah-21', type: 'allah', arabic: 'الْبَاسِط', english: 'The Expander', urdu: 'الْبَاسِط', pashto: 'الباسط', meaning: 'The Enlarger, the One who expands sustenance or increases provisions.', significance: 'He expands and increases provisions according to His will.', audioRef: '' },
+                { id: 'allah-22', type: 'allah', arabic: 'الْخَافِض', english: 'The Abaser', urdu: 'الْخَافِض', pashto: 'الخافض', meaning: 'The Humbler, the One who lowers the status of the proud and disbelievers.', significance: 'He lowers those who deserve humiliation.', audioRef: '' },
+                { id: 'allah-23', type: 'allah', arabic: 'الرَّافِع', english: 'The Exalter', urdu: 'الرَّافِع', pashto: 'الرافع', meaning: 'The Elevator, the One who raises the status of the believers and the righteous.', significance: 'He elevates those who are humble and obedient.', audioRef: '' },
+                { id: 'allah-24', type: 'allah', arabic: 'الْمُعِزّ', english: 'The Honourer', urdu: 'الْمُعِزّ', pashto: 'المعز', meaning: 'The Bestower of Honour, the One who grants honor and power to whom He wills.', significance: 'He grants honor and dignity.', audioRef: '' },
+                { id: 'allah-25', type: 'allah', arabic: 'الْمُذِلِّ', english: 'The Humiliator', urdu: 'الْمُذِلّ', pashto: 'المذل', meaning: 'The Abaser, the One who humiliates and disgraces whom He wills.', significance: 'He brings low those who are arrogant and rebellious.', audioRef: '' },
+                { id: 'allah-26', type: 'allah', arabic: 'السَّمِيع', english: 'The All-Hearing', urdu: 'السَّمِیع', pashto: 'السمیع', meaning: 'The Omniscient Listener, the One who hears everything, all sounds and supplications.', significance: 'His hearing is absolute and encompasses all things.', audioRef: '' },
+                { id: 'allah-27', type: 'allah', arabic: 'الْبَصِير', english: 'The All-Seeing', urdu: 'الْبَصِیر', pashto: 'البصیر', meaning: 'The Omniscient Observer, the One who sees everything, visible and invisible.', significance: 'His sight is absolute and encompasses all things.', audioRef: '' },
+                { id: 'allah-28', type: 'allah', arabic: 'الْحَكَم', english: 'The Judge', urdu: 'الْحَکَم', pashto: 'الحکم', meaning: 'The Arbitrator, the One who is the ultimate Judge and Decider of all matters.', significance: 'He is the ultimate authority in judgment and justice.', audioRef: '' },
+                { id: 'allah-29', type: 'allah', arabic: 'الْعَدْل', english: 'The Just', urdu: 'الْعَدْل', pashto: 'العدل', meaning: 'The Equitable, the One who is perfectly just and fair in all His actions and judgments.', significance: 'His justice is absolute and perfect.', audioRef: '' },
+                { id: 'allah-30', type: 'allah', arabic: 'اللَّطِيف', english: 'The Subtle', urdu: 'اللَّطِیف', pashto: 'اللطیف', meaning: 'The Kind, the Gentle, the One who is subtle and knows the finest details of all things.', significance: 'He is gentle, kind, and aware of the most hidden matters.', audioRef: '' },
+                { id: 'allah-31', type: 'allah', arabic: 'الْخَبِير', english: 'The All-Aware', urdu: 'الْخَبِیر', pashto: 'الخبیر', meaning: 'The Conscious, the One who is fully aware of the inner reality of all things.', significance: 'He is fully informed of everything, inside and out.', audioRef: '' },
+                { id: 'allah-32', type: 'allah', arabic: 'الْحَلِيم', english: 'The Forbearing', urdu: 'الْحَلِیم', pashto: 'الحلیم', meaning: 'The Clement, the Tolerant, the One who is patient and does not hasten to punish despite knowing all wrongdoings.', significance: 'His patience and tolerance are immense.', audioRef: '' },
+                { id: 'allah-33', type: 'allah', arabic: 'الْعَظِيم', english: 'The Magnificent', urdu: 'الْعَظِیم', pashto: 'العظیم', meaning: 'The Great, the Glorious, the One who is supreme in His greatness and majesty.', significance: 'He is the most exalted and magnificent.', audioRef: '' },
+                { id: 'allah-34', type: 'allah', arabic: 'الْغَفُور', english: 'The All-Forgiving', urdu: 'الْغَفُور', pashto: 'الغفور', meaning: 'The Much-Forgiving, the One who forgives sins extensively.', significance: 'He offers extensive forgiveness to those who repent.', audioRef: '' },
+                { id: 'allah-35', type: 'allah', arabic: 'الشَّكُور', english: 'The Appreciative', urdu: 'الشَّکُور', pashto: 'الشکور', meaning: 'The Grateful, the One who accepts and rewards even small deeds and thanks.', significance: 'He appreciates and rewards the good deeds of His servants.', audioRef: '' },
+                { id: 'allah-36', type: 'allah', arabic: 'الْعَلِيّ', english: 'The Most High', urdu: 'الْعَلِیّ', pashto: 'العلي', meaning: 'The Exalted, the One who is above all creation in status and power.', significance: 'He is supreme and elevated above all.', audioRef: '' },
+                { id: 'allah-37', type: 'allah', arabic: 'الْكَبِير', english: 'The Most Great', urdu: 'الْکَبِیر', pashto: 'الکبیر', meaning: 'The Grand, the One who is greater than anything else in existence.', significance: 'He is the greatest and most majestic.', audioRef: '' },
+                { id: 'allah-38', type: 'allah', arabic: 'الْحَفِيظ', english: 'The Preserver', urdu: 'الْحَفِیظ', pashto: 'الحفیظ', meaning: 'The Guardian, the One who protects and preserves everything.', significance: 'He safeguards and maintains all creation.', audioRef: '' },
+                { id: 'allah-39', type: 'allah', arabic: 'الْمُقِيت', english: 'The Maintainer', urdu: 'الْمُقِیت', pashto: 'المقیت', meaning: 'The Sustainer, the Feeder, the One who provides for and maintains all things.', significance: 'He provides sustenance and power to maintain life.', audioRef: '' },
+                { id: 'allah-40', type: 'allah', arabic: 'الْحَسِيب', english: 'The Accepter of Accounts', urdu: 'الْحَسِیب', pashto: 'الحسیب', meaning: 'The Reckoner, the Sufficient, the One who takes account of all actions and is sufficient for His servants.', significance: 'He is the ultimate accountant and is sufficient for those who trust Him.', audioRef: '' },
+                { id: 'allah-41', type: 'allah', arabic: 'الْجَلِيل', english: 'The Majestic', urdu: 'الْجَلِیل', pashto: 'الجلیل', meaning: 'The Glorious, the One who is great and revered in His attributes.', significance: 'He possesses immense glory and majesty.', audioRef: '' },
+                { id: 'allah-42', type: 'allah', arabic: 'الْكَرِيم', english: 'The Most Generous', urdu: 'الْکَرِیم', pashto: 'الکریم', meaning: 'The Bountiful, the One who is exceedingly generous and noble.', significance: 'His generosity is boundless and encompasses all.', audioRef: '' },
+                { id: 'allah-43', type: 'allah', arabic: 'الرَّقِيب', english: 'The Watchful', urdu: 'الرَّقِیب', pashto: 'الرقیب', meaning: 'The Observer, the One who watches over all things and is aware of their states.', significance: 'He is ever-watchful over His creation.', audioRef: '' },
+                { id: 'allah-44', type: 'allah', arabic: 'الْمُجِيب', english: 'The Responder', urdu: 'الْمُجِیب', pashto: 'المجیب', meaning: 'The Answerer of Prayers, the One who responds to the supplications of His servants.', significance: 'He answers the prayers of those who call upon Him.', audioRef: '' },
+                { id: 'allah-45', type: 'allah', arabic: 'الْوَاسِع', english: 'The All-Encompassing', urdu: 'الْوَاسِع', pashto: 'الواسع', meaning: 'The Vast, the Boundless, the One whose knowledge, mercy, and power are infinite.', significance: 'His capacity and reach are limitless.', audioRef: '' },
+                { id: 'allah-46', type: 'allah', arabic: 'الْحَكِيم', english: 'The All-Wise', urdu: 'الْحَکِیم', pashto: 'الحکیم', meaning: 'The Judge of Judges, the One who is perfect in His wisdom and judgment.', significance: 'His wisdom is absolute and manifest in all His creation and commands.', audioRef: '' },
+                { id: 'allah-47', type: 'allah', arabic: 'الْوَدُود', english: 'The Most Loving', urdu: 'الْوَدُود', pashto: 'الودود', meaning: 'The Affectionate, the One who loves His righteous servants and is loved by them.', significance: 'He is the source of love and affection.', audioRef: '' },
+                { id: 'allah-48', type: 'allah', arabic: 'الْمَجِيد', english: 'The Most Glorious', urdu: 'الْمَجِید', pashto: 'المجید', meaning: 'The Illustrious, the One who is abundant in glory and honor.', significance: 'He is supremely glorious and honorable.', audioRef: '' },
+                { id: 'allah-49', type: 'allah', arabic: 'الْبَاعِث', english: 'The Resurrector', urdu: 'الْبَاعِث', pashto: 'الباعث', meaning: 'The Awakener, the One who will raise the dead on the Day of Judgment.', significance: 'He has the power to bring life back after death.', audioRef: '' },
+                { id: 'allah-50', type: 'allah', arabic: 'الشَّهِيد', english: 'The Witness', urdu: 'الشَّھِید', pashto: 'الشهید', meaning: 'The Witness, the One who is present everywhere and witnesses all things.', significance: 'He is the ultimate witness over all actions and events.', audioRef: '' },
+                { id: 'allah-51', type: 'allah', arabic: 'الْحَقّ', english: 'The Truth', urdu: 'الْحَقّ', pashto: 'الحق', meaning: 'The Reality, the One who is the ultimate truth and whose existence is undeniable.', significance: 'He is the absolute truth, and His promises are true.', audioRef: '' },
+                { id: 'allah-52', type: 'allah', arabic: 'الْوَكِيل', english: 'The Trustee', urdu: 'الْوَکِیل', pashto: 'الوکيل', meaning: 'The Guardian, the One who is the ultimate disposer of affairs and on whom one can rely.', significance: 'He is the best one to entrust all affairs to.', audioRef: '' },
+                { id: 'allah-53', type: 'allah', arabic: 'الْقَوِيّ', english: 'The Most Strong', urdu: 'الْقَوِیّ', pashto: 'القوي', meaning: 'The Powerful, the One who possesses absolute and inexhaustible strength.', significance: 'His strength is infinite and unmatched.', audioRef: '' },
+                { id: 'allah-54', type: 'allah', arabic: 'الْمَتِين', english: 'The Firm', urdu: 'الْمَتِین', pashto: 'المتین', meaning: 'The Steadfast, the One who is firm and constant in His power.', significance: 'His power is unwavering and solid.', audioRef: '' },
+                { id: 'allah-55', type: 'allah', arabic: 'الْوَلِيّ', english: 'The Protector', urdu: 'الْوَلِیّ', pashto: 'الولي', meaning: 'The Guardian, the Helper, the One who is the close friend and protector of the believers.', significance: 'He is the helper and protector of those who believe.', audioRef: '' },
+                { id: 'allah-56', type: 'allah', arabic: 'الْحَمِيد', english: 'The Praiseworthy', urdu: 'الْحَمِید', pashto: 'الحمید', meaning: 'The Laudable, the One who is deserving of all praise and glory.', significance: 'He is praised by all creation for His perfection.', audioRef: '' },
+                { id: 'allah-57', type: 'allah', arabic: 'الْمُحْصِي', english: 'The Reckoner', urdu: 'الْمُحْصِی', pashto: 'المحصي', meaning: 'The Counter, the One who knows and counts everything, even the smallest details.', significance: 'His knowledge encompasses the count of all things.', audioRef: '' },
+                { id: 'allah-58', type: 'allah', arabic: 'الْمُبْدِئ', english: 'The Originator', urdu: 'الْمُبْدِئ', pashto: 'المبدئ', meaning: 'The Initiator, the One who begins the creation of all things.', significance: 'He is the first cause of all existence.', audioRef: '' },
+                { id: 'allah-59', type: 'allah', arabic: 'الْمُعِيد', english: 'The Restorer', urdu: 'الْمُعِید', pashto: 'المعید', meaning: 'The Renewer, the One who brings creation back after destruction.', significance: 'He will resurrect creation after death.', audioRef: '' },
+                { id: 'allah-60', type: 'allah', arabic: 'الْمُحْيِي', english: 'The Giver of Life', urdu: 'الْمُحْیِی', pashto: 'المحيي', meaning: 'The Reviver, the One who gives life to the dead and brings things to life.', significance: 'He is the source and sustainer of life.', audioRef: '' },
+                { id: 'allah-61', type: 'allah', arabic: 'الْمُمِيت', english: 'The Taker of Life', urdu: 'الْمُمِیت', pashto: 'الممیت', meaning: 'The Destroyer, the One who causes death to all living beings.', significance: 'He is the one who ordains death.', audioRef: '' },
+                { id: 'allah-62', type: 'allah', arabic: 'الْحَيّ', english: 'The Ever-Living', urdu: 'الْحَیّ', pashto: 'الحي', meaning: 'The Living, the One who has perfect and eternal life, without beginning or end.', significance: 'He is eternally alive and the source of all life.', audioRef: '' },
+                { id: 'allah-63', type: 'allah', arabic: 'الْقَيُّوم', english: 'The Self-Sustaining', urdu: 'الْقَیُّوم', pashto: 'القیوم', meaning: 'The Sustainer of All, the One who is independent and sustains everything else.', significance: 'He exists by Himself and maintains all existence.', audioRef: '' },
+                { id: 'allah-64', type: 'allah', arabic: 'الْوَاجِد', english: 'The Finder', urdu: 'الْوَاجِد', pashto: 'الواجد', meaning: 'The Perceiver, the Rich, the One who finds or perceives everything; He lacks nothing.', significance: 'He possesses all things and finds whatever He wills.', audioRef: '' },
+                { id: 'allah-65', type: 'allah', arabic: 'الْمَاجِد', english: 'The Illustrious', urdu: 'الْمَاجِد', pashto: 'الماجد', meaning: 'The Noble, the One who is abundant in glory and generosity.', significance: 'He is glorious and noble in His essence and actions.', audioRef: '' },
+                { id: 'allah-66', type: 'allah', arabic: 'الْوَاحِد', english: 'The One', urdu: 'الْوَاحِد', pashto: 'الواحد', meaning: 'The Unique, the Single, the One who is unique in His essence, attributes, and actions.', significance: 'He is absolutely one, with no partner or equal.', audioRef: '' },
+                { id: 'allah-67', type: 'allah', arabic: 'الْأَحَد', english: 'The Only One', urdu: 'الْأَحَد', pashto: 'الاحد', meaning: 'The Sole, the Indivisible, the One who is absolutely one and cannot be divided or multiplied.', significance: 'He is unique and incomparable in His oneness.', audioRef: '' },
+                { id: 'allah-68', type: 'allah', arabic: 'الصَّمَد', english: 'The Eternal', urdu: 'الصَّمَد', pashto: 'الصمد', meaning: 'The Self-Sufficient, the Independent, the One upon whom all creation depends, while He depends on none.', significance: 'He is the ultimate refuge and source of need fulfillment.', audioRef: '' },
+                { id: 'allah-69', type: 'allah', arabic: 'الْقَادِر', english: 'The Capable', urdu: 'الْقَادِر', pashto: 'القادر', meaning: 'The Powerful, the One who has the power to do anything He wills.', significance: 'His power is absolute and encompasses all possibilities.', audioRef: '' },
+                { id: 'allah-70', type: 'allah', arabic: 'الْمُقْتَدِر', english: 'The All-Powerful', urdu: 'الْمُقْتَدِر', pashto: 'المقتدر', meaning: 'The Determiner, the One who has perfect power and is able to execute His will.', significance: 'He has supreme and perfect power to ordain and execute.', audioRef: '' },
+                { id: 'allah-71', type: 'allah', arabic: 'الْمُقَدِّم', english: 'The Advancer', urdu: 'الْمُقَدِّم', pashto: 'المقدم', meaning: 'The Expediter, the One who brings things forward or gives precedence to whom He wills.', significance: 'He causes things to happen when and how He wills, bringing some forward.', audioRef: '' },
+                { id: 'allah-72', type: 'allah', arabic: 'الْمُؤَخِّر', english: 'The Delayer', urdu: 'الْمُؤَخِّر', pashto: 'المؤخر', meaning: 'The Postponer, the One who delays things or puts things back.', significance: 'He causes things to happen when and how He wills, putting some back.', audioRef: '' },
+                { id: 'allah-73', type: 'allah', arabic: 'الْأَوَّل', english: 'The First', urdu: 'الْأَوَّل', pashto: 'الاول', meaning: 'The Beginningless, the One who has no beginning.', significance: 'He existed before all creation.', audioRef: '' },
+                { id: 'allah-74', type: 'allah', arabic: 'الْآخِر', english: 'The Last', urdu: 'الْآخِر', pashto: 'الاخر', meaning: 'The Endless, the One who has no end.', significance: 'He will remain after all creation perishes.', audioRef: '' },
+                { id: 'allah-75', type: 'allah', arabic: 'الظَّاهِر', english: 'The Manifest', urdu: 'الظَّاھِر', pashto: 'الظاهر', meaning: 'The Apparent, the One who is evident and whose existence and power are clear.', significance: 'His existence is manifest through His creation.', audioRef: '' },
+                { id: 'allah-76', type: 'allah', arabic: 'الْبَاطِن', english: 'The Hidden', urdu: 'الْبَاطِن', pashto: 'الباطن', meaning: 'The Concealed, the One who is hidden and whose essence is beyond comprehension.', significance: 'He is hidden from sight and beyond human perception.', audioRef: '' },
+                { id: 'allah-77', type: 'allah', arabic: 'الْوَالِي', english: 'The Governor', urdu: 'الْوَالِی', pashto: 'الوالي', meaning: 'The Ruler, the One who governs and manages all affairs.', significance: 'He is the sole ruler and manager of the universe.', audioRef: '' },
+                { id: 'allah-78', type: 'allah', arabic: 'الْمُتَعَالِي', english: 'The Most Exalted', urdu: 'الْمُتَعَالِی', pashto: 'المتعالي', meaning: 'The Supreme, the One who is far above all creation in His attributes.', significance: 'He is supremely high and exalted.', audioRef: '' },
+                { id: 'allah-79', type: 'allah', arabic: 'الْبَرّ', english: 'The Good', urdu: 'الْبَرّ', pashto: 'البر', meaning: 'The Source of Goodness, the Kind, the One who is kind and beneficent to His creation.', significance: 'He is the source of all goodness and righteousness.', audioRef: '' },
+                { id: 'allah-80', type: 'allah', arabic: 'التَّوَّاب', english: 'The Acceptor of Repentance', urdu: 'التَّوَّاب', pashto: 'التواب', meaning: 'The Relenting, the One who accepts the repentance of His servants repeatedly.', significance: 'He is ever-ready to accept sincere repentance.', audioRef: '' },
+                { id: 'allah-81', type: 'allah', arabic: 'الْمُنْتَقِم', english: 'The Avenger', urdu: 'الْمُنْتَقِم', pashto: 'المنتقم', meaning: 'The Retaliator, the One who justly punishes wrongdoers.', significance: 'He takes retribution from those who persist in wrongdoing.', audioRef: '' },
+                { id: 'allah-82', type: 'allah', arabic: 'الْعَفُوّ', english: 'The Pardoner', urdu: 'الْعَفُوّ', pashto: 'العفو', meaning: 'The Effacer of Sins, the One who pardons and overlooks sins.', significance: 'He wipes away sins and forgives.', audioRef: '' },
+                { id: 'allah-83', type: 'allah', arabic: 'الرَّؤُوف', english: 'The Compassionate', urdu: 'الرَّؤُوف', pashto: 'الرؤوف', meaning: 'The Clement, the One who is very kind and tender towards His creation.', significance: 'His kindness and tenderness are immense.', audioRef: '' },
+                { id: 'allah-84', type: 'allah', arabic: 'مَالِكُ الْمُلْك', english: 'The Owner of All Sovereignty', urdu: 'مَالِک الْمُلْک', pashto: 'مالک الملک', meaning: 'The King of Kings, the One who possesses absolute control and dominion over the entire universe.', significance: 'He is the ultimate sovereign, owning all dominion.', audioRef: '' },
+                { id: 'allah-85', type: 'allah', arabic: 'ذُو الْجَلَالِ وَالْإِكْرَام', english: 'The Lord of Majesty and Honour', urdu: 'ذُو الْجَلَالِ وَالْإِکْرَام', pashto: 'ذو الجلال والإکرام', meaning: 'The Possessor of Majesty and Generosity, the One who is majestic and grants honor and bounty.', significance: 'He is the source of all greatness and generosity.', audioRef: '' },
+                { id: 'allah-86', type: 'allah', arabic: 'الْمُقْسِط', english: 'The Equitable', urdu: 'الْمُقْسِط', pashto: 'المقسط', meaning: 'The Just, the One who acts with fairness and justice.', significance: 'He administers perfect justice in all His dealings.', audioRef: '' },
+                { id: 'allah-87', type: 'allah', arabic: 'الْجَامِع', english: 'The Gatherer', urdu: 'الْجَامِع', pashto: 'الجامع', meaning: 'The Assembler, the One who gathers all creation together on the Day of Judgment.', significance: 'He will gather all beings for accountability.', audioRef: '' },
+                { id: 'allah-88', type: 'allah', arabic: 'الْغَنِيّ', english: 'The Self-Sufficient', urdu: 'الْغَنِیّ', pashto: 'الغني', meaning: 'The Rich, the Independent, the One who is free from need and possesses all wealth.', significance: 'He is absolutely independent and needs nothing.', audioRef: '' },
+                { id: 'allah-89', type: 'allah', arabic: 'الْمُغْنِي', english: 'The Enricher', urdu: 'الْمُغْنِی', pashto: 'المغني', meaning: 'The Bestower of Wealth, the One who grants wealth and sufficiency to whom He wills.', significance: 'He grants richness and makes others independent.', audioRef: '' },
+                { id: 'allah-90', type: 'allah', arabic: 'الْمَانِع', english: 'The Withholder', urdu: 'الْمَانِع', pashto: 'المانع', meaning: 'The Preventer, the One who prevents or withholds things.', significance: 'He prevents harm or grants protection.', audioRef: '' },
+                { id: 'allah-91', type: 'allah', arabic: 'الضَّارّ', english: 'The Distresser', urdu: 'الضَّارّ', pashto: 'الضار', meaning: 'The Afflictor, the One who can send harm or distress (by His will).', significance: 'He has the power to cause harm, though this is often understood in context of His justice or wisdom.', audioRef: '' },
+                { id: 'allah-92', type: 'allah', arabic: 'النَّافِع', english: 'The Benefactor', urdu: 'النَّافِع', pashto: 'النافع', meaning: 'The Propitious, the One who grants benefits and advantages.', significance: 'He is the source of all benefit and good.', audioRef: '' },
+                { id: 'allah-93', type: 'allah', arabic: 'النُّور', english: 'The Light', urdu: 'النُّور', pashto: 'النور', meaning: 'The Illuminator, the One who is the light of the heavens and the earth, guiding creation.', significance: 'He is the ultimate light and guide.', audioRef: '' },
+                { id: 'allah-94', type: 'allah', arabic: 'الْهَادِي', english: 'The Guide', urdu: 'الْھَادِی', pashto: 'الهادي', meaning: 'The Leader, the One who guides to the right path.', significance: 'He guides whom He wills to truth and righteousness.', audioRef: '' },
+                { id: 'allah-95', type: 'allah', arabic: 'الْبَدِيع', english: 'The Originator', urdu: 'الْبَدِیع', pashto: 'البدیع', meaning: 'The Incomparable, the One who creates things in a unique and unprecedented way.', significance: 'He creates wonders with no prior example.', audioRef: '' },
+                { id: 'allah-96', type: 'allah', arabic: 'الْبَاقِي', english: 'The Everlasting', urdu: 'الْبَاقِی', pashto: 'الباقي', meaning: 'The Enduring, the One who remains forever, whose existence is eternal.', significance: 'He is eternal and will remain when all else passes away.', audioRef: '' },
+                { id: 'allah-97', type: 'allah', arabic: 'الْوَرِث', english: 'The Inheritor', urdu: 'الْوَرِث', pashto: 'الوارث', meaning: 'The Successor, the One who inherits all things after their temporary owners perish.', significance: 'He is the ultimate owner of everything, inheriting all after death.', audioRef: '' },
+                { id: 'allah-98', type: 'allah', arabic: 'الرَّشِيد', english: 'The Guide to the Right Path', urdu: 'الرَّشِید', pashto: 'الرشید', meaning: 'The Wise Guide, the One who guides to righteousness and is the ultimate guide.', significance: 'He guides to the correct way and acts with perfect wisdom.', audioRef: '' },
+                { id: 'allah-99', type: 'allah', arabic: 'الصَّبُور', english: 'The Patient', urdu: 'الصَّبُور', pashto: 'الصبور', meaning: 'The Enduring, the One who is extremely patient and does not rush to punish wrongdoers.', significance: 'His patience is immense, giving time for repentance and delaying punishment.', audioRef: '' },
+
+                // Prophet Muhammad Names (PBUH) - Some Common Names
+                { id: 'prophet-1', type: 'prophet', arabic: 'مُحَمَّد', english: 'The Praised One', urdu: 'مُحَمَّد', pashto: 'محمد', meaning: 'The one who is praised and commendable.', significance: 'His name reflects his high status and praise by Allah and creation.', audioRef: '' },
+                { id: 'prophet-2', type: 'prophet', arabic: 'أَحْمَد', english: 'The Most Praised', urdu: 'اَحمَد', pashto: 'احمد', meaning: 'The one who praises Allah the most.', significance: 'Highlights his deep devotion and praise of his Lord.', audioRef: '' },
+                { id: 'prophet-3', type: 'prophet', arabic: 'مَاحِي', english: 'The Effacer', urdu: 'مَاحِی', pashto: 'ماحي', meaning: 'The one through whom disbelief is effaced.', significance: 'His message abolished idolatry and brought truth.', audioRef: '' },
+                { id: 'prophet-4', type: 'prophet', arabic: 'حَاشِر', english: 'The Gatherer', urdu: 'حَاشِر', pashto: 'حاشر', meaning: 'The one at whose feet people will be gathered on the Day of Judgment.', significance: 'His position on the Day of Judgment.', audioRef: '' },
+                { id: 'prophet-5', type: 'prophet', arabic: 'عَاقِب', english: 'The Successor', urdu: 'عَاقِب', pashto: 'عاقب', meaning: 'The last Prophet, after whom there is no other.', significance: 'Confirms the finality of his prophethood.', audioRef: '' },
+                { id: 'prophet-6', type: 'prophet', arabic: 'طٰهٰ', english: 'Ta-Ha', urdu: 'طٰہٰ', pashto: 'طاها', meaning: 'A name mentioned in the Quran (Surah Ta-Ha).', significance: 'One of the revered names mentioned in the Holy Quran.', audioRef: '' },
+                { id: 'prophet-7', type: 'prophet', arabic: 'يٰس', english: 'Ya-Sin', urdu: 'یٰس', pashto: 'یاسین', meaning: 'A name mentioned in the Quran (Surah Ya-Sin).', significance: 'One of the revered names mentioned in the Holy Quran.', audioRef: '' },
+                { id: 'prophet-8', type: 'prophet', arabic: 'مُزَّمِّل', english: 'The Enwrapped One', urdu: 'مُزَّمِّل', pashto: 'مزمل', meaning: 'The one wrapped in garments (as mentioned in Surah Al-Muzzammil).', significance: 'Refers to his state during revelation or prayer.', audioRef: '' },
+                { id: 'prophet-9', type: 'prophet', arabic: 'مُدَّثِّر', english: 'The Cloaked One', urdu: 'مُدَّثِّر', pashto: 'مدثر', meaning: 'The one covered in a cloak (as mentioned in Surah Al-Muddaththir).', significance: 'Refers to his state after receiving revelation.', audioRef: '' },
+                { id: 'prophet-10', type: 'prophet', arabic: 'رَسُولُ الله', english: 'Messenger of Allah', urdu: 'رَسُولُ اللہ', pashto: 'رسول الله', meaning: 'The one sent by Allah to convey His message.', significance: 'His primary title and role as the final messenger.', audioRef: '' },
+                { id: 'prophet-11', type: 'prophet', arabic: 'نَبِيُّ الله', english: 'Prophet of Allah', urdu: 'نَبِیُّ اللہ', pashto: 'نبي الله', meaning: 'The one chosen by Allah to receive revelation.', significance: 'His status as a prophet of God.', audioRef: '' },
+                { id: 'prophet-12', type: 'prophet', arabic: 'خَاتَمُ النَّبِيِّين', english: 'Seal of the Prophets', urdu: 'خَاتَمُ النَّبِیِّین', pashto: 'خاتم النبیین', meaning: 'The last prophet, after whom there will be no other prophets.', significance: 'Confirms the finality of his prophethood.', audioRef: '' },
+                { id: 'prophet-13', type: 'prophet', arabic: 'شَاهِد', english: 'Witness', urdu: 'شَاھِد', pashto: 'شاهد', meaning: 'One who witnesses for or against people on the Day of Judgment.', significance: 'He will be a witness over his community.', audioRef: '' },
+                { id: 'prophet-14', type: 'prophet', arabic: 'مُبَشِّر', english: 'Bearer of Good News', urdu: 'مُبَشِّر', pashto: 'مبشر', meaning: 'One who gives good tidings (of Paradise to believers).', significance: 'He brought the good news of salvation.', audioRef: '' },
+                { id: 'prophet-15', type: 'prophet', arabic: 'نَذِير', english: 'Warner', urdu: 'نَذِیر', pashto: 'نذیر', meaning: 'One who warns (of Hellfire to disbelievers).', significance: 'He warned humanity against disbelief and its consequences.', audioRef: '' },
+                { id: 'prophet-16', type: 'prophet', arabic: 'دَاعِي إِلَى الله', english: 'Caller to Allah', urdu: 'دَاعِی اِلَی اللہ', pashto: 'داعي الی الله', meaning: 'One who invites people to the worship of Allah.', significance: 'His mission was to call people to monotheism.', audioRef: '' },
+                { id: 'prophet-17', type: 'prophet', arabic: 'سِرَاج مُّنِير', english: 'Luminous Lamp', urdu: 'سِرَاج مُّنِیر', pashto: 'سراج منیر', meaning: 'A bright lamp, illuminating the path to Allah.', significance: 'His guidance illuminates the way for humanity.', audioRef: '' },
+                { id: 'prophet-18', type: 'prophet', arabic: 'مُصْطَفَىٰ', english: 'The Chosen One', urdu: 'مُصْطَفٰیٰ', pashto: 'مصطفی', meaning: 'The one selected or chosen by Allah.', significance: 'He was chosen by Allah for prophethood.', audioRef: '' },
+                { id: 'prophet-19', type: 'prophet', arabic: 'مُجْتَبَىٰ', english: 'The Selected One', urdu: 'مُجْتَبٰیٰ', pashto: 'مجتبی', meaning: 'The one specially chosen and favored.', significance: 'He was specially selected and favored by Allah.', audioRef: '' },
+                { id: 'prophet-20', type: 'prophet', arabic: 'مُرْتَضَىٰ', english: 'The One Approved By Allah', urdu: 'مُرْتَضٰیٰ', pashto: 'مرتضی', meaning: 'The one with whom Allah is pleased.', significance: 'He attained the pleasure of Allah.', audioRef: '' },
+                { id: 'prophet-21', type: 'prophet', arabic: 'أَمِين', english: 'The Trustworthy', urdu: 'اَمِین', pashto: 'امین', meaning: 'The one who is honest and reliable.', significance: 'He was known for his trustworthiness before and after prophethood.', audioRef: '' },
+                { id: 'prophet-22', type: 'prophet', arabic: 'صَادِق', english: 'The Truthful', urdu: 'صَادِق', pashto: 'صادق', meaning: 'The one who is truthful in speech and action.', significance: 'His truthfulness was a hallmark of his character.', audioRef: '' },
+                { id: 'prophet-23', type: 'prophet', arabic: 'مَأْمُون', english: 'The Secured One', urdu: 'مَأْمُون', pashto: 'مامون', meaning: 'The one who is safe and secure (from error in conveying the message).', significance: 'He was protected by Allah in conveying the divine message.', audioRef: '' },
+                { id: 'prophet-24', type: 'prophet', arabic: 'كَرِيم', english: 'The Noble', urdu: 'کَرِیم', pashto: 'کریم', meaning: 'The generous and honorable one.', significance: 'He possessed noble character and generosity.', audioRef: '' },
+                { id: 'prophet-25', type: 'prophet', arabic: 'رَحْمَة لِّلْعَالَمِين', english: 'Mercy to the Worlds', urdu: 'رَحْمَة لِّلْعَالَمِین', pashto: 'رحمة للعالمین', meaning: 'The one sent as a mercy to all of creation.', significance: 'His mission brought mercy to all beings.', audioRef: '' },
+                // Add more names of Prophet Muhammad (PBUH) as needed...
+                // It's important to note that the number of names for Prophet Muhammad (PBUH) is not fixed at 99 like Asma ul Husna.
+                // These are some commonly mentioned names/titles.
+            ],
+            // Initial settings (will be loaded from IndexedDB or default)
+            settings: {
+                quizLanguages: ['urdu'], // Default to English
+                quizSets: ['allah'], // Default to Asma ul Husna
+                quizQuestionCount: 10,
+                theme: 'dark'
+            },
+            // Initial progress (will be loaded from IndexedDB or default)
+            progress: {
+                totalGames: 0,
+                totalCorrect: 0,
+                totalIncorrect: 0,
+                lastPlayed: null
+            }
+        };
+
+        // --- IndexedDB Setup ---
+        const DB_NAME = 'BeautifulNamesDB';
+        const DB_VERSION = 1;
+        let db;
+
+        function openDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = (event) => {
+                    console.error('IndexedDB error:', event.target.errorCode);
+                    reject('Database error');
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    // Create object stores if they don't exist
+                    if (!db.objectStoreNames.contains('names')) {
+                        const namesStore = db.createObjectStore('names', { keyPath: 'id' });
+                        // Can create indexes here if needed, e.g., namesStore.createIndex('type', 'type', { unique: false });
+                    }
+                    if (!db.objectStoreNames.contains('progress')) {
+                        db.createObjectStore('progress', { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains('settings')) {
+                        db.createObjectStore('settings', { keyPath: 'id' });
+                    }
+                };
+
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('Database opened successfully');
+                    db.onerror = (event) => {
+                        console.error('Database error from success handler:', event.target.errorCode);
+                    };
+                    resolve(db);
+                };
+            });
+        }
+
+        function getObjectStore(storeName, mode) {
+             if (!db) {
+                console.error('Database not initialized');
+                throw new Error('Database not initialized');
+            }
+            const tx = db.transaction(storeName, mode);
+            return tx.objectStore(storeName);
+        }
+
+        function getAllData(storeName) {
+            return new Promise((resolve, reject) => {
+                const store = getObjectStore(storeName, 'readonly');
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function getData(storeName, key) {
+             return new Promise((resolve, reject) => {
+                const store = getObjectStore(storeName, 'readonly');
+                const request = store.get(key);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function putData(storeName, data) {
+            return new Promise((resolve, reject) => {
+                const store = getObjectStore(storeName, 'readwrite');
+                const request = store.put(data);
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        function clearStore(storeName) {
+             return new Promise((resolve, reject) => {
+                const store = getObjectStore(storeName, 'readwrite');
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => reject(event.target.error);
+            });
+        }
+
+        async function initializeData() {
+            try {
+                const namesCount = (await getAllData('names')).length;
+                if (namesCount === 0) {
+                    console.log('Populating names data...');
+                    const store = getObjectStore('names', 'readwrite');
+                    appData.names.forEach(name => {
+                         // Add initial SRS data if missing
+                        if (!name.srs) {
+                             name.srs = { level: 0, interval: 0, ease: 2.5, lastReview: null };
+                        }
+                        store.add(name);
+                    });
+                     await new Promise(resolve => store.transaction.oncomplete = resolve); // Wait for transaction
+                    console.log('Names data populated.');
+                } else {
+                     // Load existing names data from DB into appData.names (optional, but good for state consistency)
+                     appData.names = await getAllData('names');
+                     console.log('Names data loaded from DB.');
+                }
+
+                const settings = await getData('settings', 'user');
+                if (!settings) {
+                    console.log('Saving initial settings...');
+                    await putData('settings', { id: 'user', ...appData.settings });
+                    console.log('Initial settings saved.');
+                } else {
+                    appData.settings = settings; // Load existing settings
+                     console.log('Settings loaded from DB.');
+                }
+
+                 const progress = await getData('progress', 'global');
+                if (!progress) {
+                    console.log('Saving initial progress...');
+                    await putData('progress', { id: 'global', ...appData.progress });
+                    console.log('Initial progress saved.');
+                } else {
+                    appData.progress = progress; // Load existing progress
+                     console.log('Progress loaded from DB.');
+                }
+
+
+            } catch (error) {
+                console.error('Error initializing data:', error);
+            }
+        }
+
+        // --- State Management & UI Navigation ---
+        let currentSection = 'home';
+        const sections = document.querySelectorAll('.content-section');
+        const navButtons = document.querySelectorAll('.menu button');
+
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            currentSection = sectionId.replace('section-', ''); // Update state
+
+            // Update nav button active state (optional styling)
+             navButtons.forEach(button => {
+                 if (button.id === `btn-${currentSection}`) {
+                     // Add an 'active' class for styling if needed
+                     // button.classList.add('active');
+                 } else {
+                     // button.classList.remove('active');
+                 }
+             });
+
+            // Perform actions specific to the shown section
+            if (sectionId === 'section-list') {
+                renderNamesList();
+            } else if (sectionId === 'section-settings') {
+                loadSettings();
+            } else if (sectionId === 'section-progress') {
+                renderProgress();
+            } else {
+                 // Reset game areas when leaving them
+                 resetQuiz();
+                 resetMemory();
+                 resetMatch();
+            }
+        }
+
+        // --- Core Data & Settings ---
+        let allNames = []; // Will be populated from IndexedDB
+        let userSettings = {}; // Will be populated from IndexedDB
+        let userProgress = {}; // Will be populated from IndexedDB
+
+        async function loadInitialDataFromDB() {
+             allNames = await getAllData('names');
+             userSettings = await getData('settings', 'user') || appData.settings;
+             userProgress = await getData('progress', 'global') || appData.progress;
+             console.log('App data loaded from DB:', { allNames, userSettings, userProgress });
+        }
+
+        // --- Helper Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        function speakText(text, lang = 'ar-SA') { // Default to Arabic Saudi Arabia
+             if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = lang; // Set language
+                 // Optional: Find a specific voice if needed
+                 // const voices = window.speechSynthesis.getVoices();
+                 // utterance.voice = voices.find(voice => voice.lang === lang) || voices[0]; // Use first voice if specific not found
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn('Web Speech API not supported in this browser.');
+                // Could show a message to the user
+            }
+        }
+
+        function getTranslation(name, lang) {
+            switch (lang) {
+                case 'english': return name.english;
+                case 'urdu': return name.urdu;
+                case 'pashto': return name.pashto;
+                default: return name.english; // Fallback
+            }
+        }
+
+        // --- Names List ---
+        async function renderNamesList() {
+            const namesListDiv = document.querySelector('#section-list .names-list');
+            namesListDiv.innerHTML = '<p class="text-center">Loading names...</p>'; // Loading indicator
+
+            try {
+                 const names = await getAllData('names'); // Get fresh data
+                 allNames = names; // Update global cache
+                namesListDiv.innerHTML = ''; // Clear loading
+
+                if (names.length === 0) {
+                    namesListDiv.innerHTML = '<p class="text-center">No names found. Data might not be loaded correctly.</p>';
+                    return;
+                }
+
+                names.forEach(name => {
+                    const item = document.createElement('div');
+                    item.classList.add('name-item');
+                    item.innerHTML = `
+                        <h3>${getTranslation(name, 'english')}</h3>
+                        <p class="arabic">${name.arabic}</p>
+                        <p class="meaning">${name.meaning}</p>
+                        ${name.significance ? `<p class="significance">Significance: ${name.significance}</p>` : ''}
+                        <p>
+                            Translations:
+                            ${name.english ? `English: ${name.english}` : ''}
+                            ${name.urdu ? ` | Urdu: ${name.urdu}` : ''}
+                            ${name.pashto ? ` | Pashto: ${name.pashto}` : ''}
+                        </p>
+                        <button class="play-audio-btn" data-arabic="${name.arabic}">Play Pronunciation</button>
+                    `;
+                    namesListDiv.appendChild(item);
+                });
+
+                // Add event listeners for audio buttons
+                namesListDiv.querySelectorAll('.play-audio-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const arabicText = button.dataset.arabic;
+                        speakText(arabicText, 'ar-SA'); // Use Arabic language code
+                    });
+                });
+
+                 // Add event listeners to open detail modal
+                 namesListDiv.querySelectorAll('.name-item').forEach(item => {
+                     // Avoid adding click listener to the button itself
+                     item.addEventListener('click', (event) => {
+                         if (!event.target.classList.contains('play-audio-btn')) {
+                              const arabicText = item.querySelector('.arabic').textContent;
+                              const name = allNames.find(n => n.arabic === arabicText);
+                              if (name) {
+                                  showNameDetailModal(name);
+                              }
+                         }
+                     });
+                 });
+
+
+            } catch (error) {
+                console.error('Error rendering names list:', error);
+                namesListDiv.innerHTML = '<p class="text-center">Error loading names.</p>';
+            }
+        }
+
+         // --- Name Detail Modal ---
+         const nameDetailModal = document.getElementById('name-detail-modal');
+         const modalCloseBtn = nameDetailModal.querySelector('.modal-close');
+         const modalNameTitle = document.getElementById('modal-name-title');
+         const modalNameArabic = document.getElementById('modal-name-arabic');
+         const modalNameTranslation = document.getElementById('modal-name-translation');
+         const modalNameMeaning = document.getElementById('modal-name-meaning');
+         const modalNameSignificance = document.getElementById('modal-name-significance');
+         const modalPlayAudioBtn = document.getElementById('modal-play-audio');
+
+         function showNameDetailModal(name) {
+            modalNameTitle.textContent = getTranslation(name, 'english'); // Use English for title
+            modalNameArabic.textContent = name.arabic;
+            modalNameTranslation.innerHTML = `Translations: ${name.english ? `English: ${name.english}` : ''} ${name.urdu ? ` | Urdu: ${name.urdu}` : ''} ${name.pashto ? ` | Pashto: ${name.pashto}` : ''}`;
+            modalNameMeaning.textContent = name.meaning;
+            modalNameSignificance.textContent = name.significance ? `Significance: ${name.significance}` : '';
+            modalNameSignificance.classList.toggle('hidden', !name.significance); // Hide if no significance
+
+            // Update audio button data
+            modalPlayAudioBtn.dataset.arabic = name.arabic;
+
+            nameDetailModal.style.display = 'flex'; // Show modal
+         }
+
+         function hideNameDetailModal() {
+             nameDetailModal.style.display = 'none'; // Hide modal
+         }
+
+         modalCloseBtn.addEventListener('click', hideNameDetailModal);
+         modalPlayAudioBtn.addEventListener('click', () => {
+             const arabicText = modalPlayAudioBtn.dataset.arabic;
+             if (arabicText) {
+                  speakText(arabicText, 'ar-SA');
+             }
+         });
+        // Close modal if clicking outside the content
+         nameDetailModal.addEventListener('click', (event) => {
+             if (event.target === nameDetailModal) {
+                 hideNameDetailModal();
+             }
+         });
+
+
+        // --- Settings ---
+        const settingsForm = document.querySelector('.settings-form');
+        const btnSaveSettings = document.getElementById('btn-save-settings');
+
+        async function loadSettings() {
+            userSettings = await getData('settings', 'user') || appData.settings; // Load fresh settings
+            document.getElementById('setting-lang-english').checked = userSettings.quizLanguages.includes('english');
+            document.getElementById('setting-lang-urdu').checked = userSettings.quizLanguages.includes('urdu');
+            document.getElementById('setting-lang-pashto').checked = userSettings.quizLanguages.includes('pashto');
+            document.getElementById('setting-set-allah').checked = userSettings.quizSets.includes('allah');
+            document.getElementById('setting-set-prophet').checked = userSettings.quizSets.includes('prophet');
+            document.getElementById('setting-quiz-count').value = userSettings.quizQuestionCount;
+            document.querySelector(`input[name="theme"][value="${userSettings.theme}"]`).checked = true;
+        }
+
+        async function saveSettings() {
+            const quizLanguages = [];
+            if (document.getElementById('setting-lang-english').checked) quizLanguages.push('english');
+            if (document.getElementById('setting-lang-urdu').checked) quizLanguages.push('urdu');
+            if (document.getElementById('setting-lang-pashto').checked) quizLanguages.push('pashto');
+
+            const quizSets = [];
+            if (document.getElementById('setting-set-allah').checked) quizSets.push('allah');
+            if (document.getElementById('setting-set-prophet').checked) quizSets.push('prophet');
+
+            const quizQuestionCount = parseInt(document.getElementById('setting-quiz-count').value, 10);
+             const theme = document.querySelector('input[name="theme"]:checked').value;
+
+
+            userSettings = {
+                id: 'user',
+                quizLanguages,
+                quizSets,
+                quizQuestionCount,
+                theme
+            };
+
+            try {
+                await putData('settings', userSettings);
+                console.log('Settings saved:', userSettings);
+                alert('Settings saved!'); // Simple feedback
+                 applyTheme(userSettings.theme);
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Error saving settings.');
+            }
+        }
+
+        function applyTheme(theme) {
+            // Currently only 'dark' is implemented, which is the default CSS.
+            // For other themes, you would add/remove classes on the body or container
+            // and define corresponding CSS rules.
+            console.log("Applying theme:", theme);
+            // Example: document.body.className = theme + '-theme';
+        }
+
+
+        // --- Progress & Backup/Restore ---
+        async function renderProgress() {
+             userProgress = await getData('progress', 'global') || appData.progress; // Load fresh progress
+             allNames = await getAllData('names'); // Load fresh names for SRS status
+
+            document.getElementById('progress-total-quizzes').textContent = userProgress.totalGames;
+            document.getElementById('progress-total-correct').textContent = userProgress.totalCorrect;
+            document.getElementById('progress-total-incorrect').textContent = userProgress.totalIncorrect;
+            document.getElementById('progress-last-played').textContent = userProgress.lastPlayed ? new Date(userProgress.lastPlayed).toLocaleString() : 'Never';
+
+            const srsListDiv = document.getElementById('srs-status-list');
+            srsListDiv.innerHTML = ''; // Clear list
+
+            if (allNames.length === 0) {
+                 srsListDiv.innerHTML = '<p class="text-center">No name data available for SRS status.</p>';
+                 return;
+            }
+
+            // Sort names by SRS level or last review date
+            const sortedNames = allNames.sort((a, b) => {
+                 if (a.srs.level !== b.srs.level) {
+                     return a.srs.level - b.srs.level; // Lower levels first
+                 }
+                 // For same level, show those reviewed longer ago first
+                 const dateA = a.srs.lastReview ? new Date(a.srs.lastReview).getTime() : 0;
+                 const dateB = b.srs.lastReview ? new Date(b.srs.lastReview).getTime() : 0;
+                 return dateA - dateB;
+            });
+
+
+            sortedNames.forEach(name => {
+                 const item = document.createElement('div');
+                 item.classList.add('srs-item');
+                 const srsStatus = name.srs.level === 0 ? 'New' : `Level ${name.srs.level}, Due: ${name.srs.lastReview ? new Date(new Date(name.srs.lastReview).getTime() + name.srs.interval * 24 * 60 * 60 * 1000).toLocaleDateString() : 'N/A'}`;
+                 item.innerHTML = `
+                     <span>${getTranslation(name, 'english')} (${name.arabic})</span>
+                     <span class="srs-level">${srsStatus}</span>
+                 `;
+                 srsListDiv.appendChild(item);
+            });
+        }
+
+        async function backupData() {
+            try {
+                const allNamesData = await getAllData('names');
+                const settingsData = await getData('settings', 'user');
+                const progressData = await getData('progress', 'global');
+
+                const backup = {
+                    version: 1, // Backup format version
+                    timestamp: new Date().toISOString(),
+                    names: allNamesData,
+                    settings: settingsData,
+                    progress: progressData
+                };
+
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `beautiful_names_backup_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('Backup created successfully!');
+
+            } catch (error) {
+                console.error('Backup failed:', error);
+                alert('Backup failed. See console for details.');
+            }
+        }
+
+        async function restoreData(file) {
+            const reader = new FileReader();
+            const restoreStatus = document.getElementById('restore-status');
+            restoreStatus.textContent = 'Reading file...';
+
+            reader.onload = async (event) => {
+                try {
+                    const backup = JSON.parse(event.target.result);
+
+                    if (backup.version !== 1) {
+                        throw new Error('Unsupported backup file version.');
+                    }
+
+                    if (!confirm('Restoring data will overwrite your current progress and settings. Are you sure?')) {
+                        restoreStatus.textContent = 'Restore cancelled.';
+                        return;
+                    }
+
+                    restoreStatus.textContent = 'Clearing existing data...';
+                    await clearStore('names');
+                    await clearStore('settings');
+                    await clearStore('progress');
+
+                    restoreStatus.textContent = 'Importing data...';
+                    const nameStore = getObjectStore('names', 'readwrite');
+                    backup.names.forEach(name => nameStore.add(name));
+                     await new Promise(resolve => nameStore.transaction.oncomplete = resolve); // Wait for transaction
+
+                    if (backup.settings) {
+                         await putData('settings', backup.settings);
+                    }
+                     if (backup.progress) {
+                         await putData('progress', backup.progress);
+                    }
+
+                    restoreStatus.textContent = 'Restore complete! Please navigate to other sections to see changes.';
+                    await loadInitialDataFromDB(); // Reload app data into memory
+                    renderProgress(); // Refresh progress view
+                    // Note: Settings and List views will refresh when navigated to.
+
+                } catch (error) {
+                    console.error('Restore failed:', error);
+                    restoreStatus.textContent = `Restore failed: ${error.message}`;
+                    alert(`Restore failed: ${error.message}`);
+                }
+            };
+
+            reader.onerror = (event) => {
+                console.error('File reading error:', event.target.error);
+                restoreStatus.textContent = 'Error reading file.';
+                alert('Error reading file.');
+            };
+
+            reader.readAsText(file);
+        }
+
+
+        // --- Quiz Game Logic ---
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let availableNamesForQuiz = [];
+
+        const quizCurrentSpan = document.getElementById('quiz-current');
+        const quizTotalSpan = document.getElementById('quiz-total');
+        const quizScoreSpan = document.getElementById('quiz-score');
+        const quizMeaningP = document.getElementById('quiz-meaning');
+        const quizOptionsDiv = document.getElementById('quiz-options');
+        const quizFeedbackDiv = document.getElementById('quiz-feedback');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+        const quizStartBtn = document.getElementById('quiz-start-btn');
+
+        function resetQuiz() {
+             quizQuestions = [];
+             currentQuestionIndex = 0;
+             quizScore = 0;
+             availableNamesForQuiz = [];
+             quizCurrentSpan.textContent = '0';
+             quizTotalSpan.textContent = '0';
+             quizScoreSpan.textContent = '0';
+             quizMeaningP.textContent = 'Loading question...';
+             quizOptionsDiv.innerHTML = '';
+             quizFeedbackDiv.textContent = '';
+             quizFeedbackDiv.className = 'game-feedback';
+             quizNextBtn.classList.add('hidden');
+             quizStartBtn.classList.remove('hidden');
+        }
+
+
+        async function startQuiz() {
+            resetQuiz();
+            quizStartBtn.classList.add('hidden');
+            quizFeedbackDiv.textContent = '';
+
+            // Filter names based on settings
+            availableNamesForQuiz = allNames.filter(name => userSettings.quizSets.includes(name.type));
+
+            if (availableNamesForQuiz.length < 4 || userSettings.quizLanguages.length === 0) {
+                 quizMeaningP.textContent = 'Not enough names or languages selected in settings to start a quiz.';
+                 quizStartBtn.classList.remove('hidden');
+                 return;
+            }
+
+            // Select names for the quiz based on SRS and count
+            // Simple selection: Prioritize low SRS levels, then random
+            const sortedBySRS = availableNamesForQuiz.sort((a, b) => {
+                 // Names due for review first (level > 0, lastReview + interval < now)
+                 const now = new Date().getTime();
+                 const isDueA = a.srs.level > 0 && a.srs.lastReview && (new Date(a.srs.lastReview).getTime() + a.srs.interval * 24 * 60 * 60 * 1000) < now;
+                 const isDueB = b.srs.level > 0 && b.srs.lastReview && (new Date(b.srs.lastReview).getTime() + b.srs.interval * 24 * 60 * 60 * 1000) < now;
+
+                 if (isDueA && !isDueB) return -1;
+                 if (!isDueA && isDueB) return 1;
+                 if (isDueA && isDueB) {
+                     // Both due, prioritize lowest level or longest overdue
+                     if (a.srs.level !== b.srs.level) return a.srs.level - b.srs.level;
+                      const dateA = a.srs.lastReview ? new Date(a.srs.lastReview).getTime() : 0;
+                      const dateB = b.srs.lastReview ? new Date(b.srs.lastReview).getTime() : 0;
+                      return dateA - dateB; // Longest ago first
+                 }
+
+                 // Neither due or new, prioritize lowest level
+                 if (a.srs.level !== b.srs.level) return a.srs.level - b.srs.level;
+
+                 // Same level, random order
+                 return Math.random() - 0.5; // Random tie-breaker
+            });
+
+            const quizNames = sortedBySRS.slice(0, userSettings.quizQuestionCount);
+
+            if (quizNames.length < userSettings.quizQuestionCount) {
+                 console.warn(`Not enough unique names (${quizNames.length}) available for ${userSettings.quizQuestionCount} questions.`);
+                 // Continue with available names, or show error
+                 if (quizNames.length < 4) {
+                      quizMeaningP.textContent = 'Not enough unique names available to create quiz questions.';
+                      quizStartBtn.classList.remove('hidden');
+                      return;
+                 }
+            }
+
+
+            // Generate quiz questions
+            quizQuestions = quizNames.map(correctName => {
+                const language = shuffleArray([...userSettings.quizLanguages])[0]; // Pick a random enabled language
+                const questionMeaning = correctName.meaning;
+
+                // Select 3 incorrect options
+                const incorrectOptions = shuffleArray(availableNamesForQuiz.filter(name => name.id !== correctName.id)).slice(0, 3);
+                const options = shuffleArray([...incorrectOptions, correctName]); // Add correct and shuffle
+
+                return {
+                    correctNameId: correctName.id,
+                    meaning: questionMeaning,
+                    options: options.map(opt => ({ id: opt.id, text: getTranslation(opt, language) }))
+                };
+            });
+
+            quizTotalSpan.textContent = quizQuestions.length;
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            quizScoreSpan.textContent = quizScore;
+
+            displayQuizQuestion();
+
+             // Update global progress - game started
+             userProgress.totalGames++;
+             userProgress.lastPlayed = new Date().toISOString();
+             await putData('progress', userProgress);
+        }
+
+        function displayQuizQuestion() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+
+            const question = quizQuestions[currentQuestionIndex];
+            quizCurrentSpan.textContent = currentQuestionIndex + 1;
+            quizMeaningP.textContent = question.meaning;
+            quizOptionsDiv.innerHTML = ''; // Clear previous options
+            quizFeedbackDiv.textContent = '';
+            quizFeedbackDiv.className = 'game-feedback';
+            quizNextBtn.classList.add('hidden');
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.dataset.nameId = option.id;
+                button.addEventListener('click', handleQuizOptionClick);
+                quizOptionsDiv.appendChild(button);
+            });
+        }
+
+        async function handleQuizOptionClick(event) {
+            const selectedNameId = event.target.dataset.nameId;
+            const correctAnswerId = quizQuestions[currentQuestionIndex].correctNameId;
+            const isCorrect = selectedNameId === correctAnswerId;
+
+            // Disable all options after selection
+            quizOptionsDiv.querySelectorAll('button').forEach(button => {
+                button.disabled = true;
+                if (button.dataset.nameId === correctAnswerId) {
+                    button.classList.add('correct');
+                } else if (button.dataset.nameId === selectedNameId) {
+                    button.classList.add('incorrect');
+                }
+            });
+
+            // Provide feedback
+            if (isCorrect) {
+                quizScore++;
+                quizScoreSpan.textContent = quizScore;
+                quizFeedbackDiv.textContent = 'Correct!';
+                quizFeedbackDiv.className = 'game-feedback feedback-correct';
+                 userProgress.totalCorrect++;
+            } else {
+                const correctAnswer = allNames.find(name => name.id === correctAnswerId);
+                const correctText = getTranslation(correctAnswer, userSettings.quizLanguages[0] || 'english'); // Show correct in first enabled language
+                quizFeedbackDiv.textContent = `Incorrect. The correct answer was: ${correctText} (${correctAnswer.arabic})`;
+                quizFeedbackDiv.className = 'game-feedback feedback-incorrect';
+                 userProgress.totalIncorrect++;
+            }
+
+            // Update SRS data for the name
+             const nameToUpdate = allNames.find(name => name.id === correctAnswerId);
+             if (nameToUpdate) {
+                 // Simple SRS update logic (can be more complex)
+                 let { level, interval, ease } = nameToUpdate.srs;
+
+                 if (isCorrect) {
+                     if (level === 0) { // New name, first correct answer
+                         level = 1;
+                         interval = 1; // Review in 1 day
+                     } else if (level === 1) { // Second correct answer
+                         level = 2;
+                         interval = 6; // Review in 6 days
+                     } else { // Subsequent correct answers
+                         interval = Math.round(interval * ease);
+                         level++;
+                     }
+                     ease = Math.max(1.3, ease + (0.1 - (5 - 5) * (0.08 + (5 - 5) * 0.02))); // Simplified ease factor update (5 is perfect score)
+                 } else { // Incorrect answer
+                     level = 1; // Go back to learning level
+                     interval = 1; // Review in 1 day
+                     ease = Math.max(1.3, ease - 0.2); // Decrease ease factor
+                 }
+
+                 nameToUpdate.srs = {
+                     level: level,
+                     interval: interval,
+                     ease: ease,
+                     lastReview: new Date().toISOString()
+                 };
+
+                 // Update in IndexedDB and global cache
+                 await putData('names', nameToUpdate);
+                 const index = allNames.findIndex(n => n.id === nameToUpdate.id);
+                 if (index !== -1) allNames[index] = nameToUpdate;
+             }
+
+            // Show next question button
+            quizNextBtn.classList.remove('hidden');
+
+             // Update global progress in DB after each question
+             await putData('progress', userProgress);
+        }
+
+        function nextQuizQuestion() {
+            currentQuestionIndex++;
+            displayQuizQuestion();
+        }
+
+        function endQuiz() {
+            quizMeaningP.textContent = `Quiz Finished! Your final score is ${quizScore} out of ${quizQuestions.length}.`;
+            quizOptionsDiv.innerHTML = '';
+            quizFeedbackDiv.textContent = 'Review your progress in the Progress section.';
+            quizFeedbackDiv.className = 'game-feedback';
+            quizNextBtn.classList.add('hidden');
+            quizStartBtn.classList.remove('hidden');
+        }
+
+
+        // --- Memory Game Logic ---
+        let memoryCards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let memoryAttempts = 0;
+        let isBoardLocked = false;
+
+        const memoryBoardDiv = document.getElementById('memory-board');
+        const memoryPairsSpan = document.getElementById('memory-pairs');
+        const memoryAttemptsSpan = document.getElementById('memory-attempts');
+        const memoryFeedbackDiv = document.getElementById('memory-feedback');
+        const memoryStartBtn = document.getElementById('memory-start-btn');
+
+         function resetMemory() {
+             memoryCards = [];
+             flippedCards = [];
+             matchedPairs = 0;
+             memoryAttempts = 0;
+             isBoardLocked = false;
+             memoryBoardDiv.innerHTML = '';
+             memoryPairsSpan.textContent = '0';
+             memoryAttemptsSpan.textContent = '0';
+             memoryFeedbackDiv.textContent = '';
+             memoryFeedbackDiv.className = 'game-feedback';
+             memoryStartBtn.classList.remove('hidden');
+         }
+
+
+        async function startMemoryGame() {
+            resetMemory();
+            memoryStartBtn.classList.add('hidden');
+            memoryFeedbackDiv.textContent = '';
+
+             // Filter names based on settings (using only enabled languages for translation)
+            const filteredNames = allNames.filter(name => userSettings.quizSets.includes(name.type));
+
+             if (filteredNames.length < 4 || userSettings.quizLanguages.length === 0) {
+                 memoryBoardDiv.innerHTML = '<p class="text-center">Not enough names or languages selected in settings to start a memory game.</p>';
+                 memoryStartBtn.classList.remove('hidden');
+                 return;
+            }
+
+            // Select a subset of names (e.g., 8 names for 16 cards)
+            const namesForGame = shuffleArray(filteredNames).slice(0, 8); // Adjust number based on desired board size
+
+            if (namesForGame.length < 4) { // Need at least 4 names for 8 cards (4 pairs)
+                 memoryBoardDiv.innerHTML = '<p class="text-center">Not enough unique names available to create memory cards.</p>';
+                 memoryStartBtn.classList.remove('hidden');
+                 return;
+            }
+
+            // Create card pairs (Name vs Meaning)
+             memoryCards = [];
+             namesForGame.forEach(name => {
+                 const language = shuffleArray([...userSettings.quizLanguages])[0]; // Pick a random enabled language for the name card
+                 memoryCards.push({ id: name.id, type: 'name', text: getTranslation(name, language), isFlipped: false, isMatched: false });
+                 memoryCards.push({ id: name.id, type: 'meaning', text: name.meaning, isFlipped: false, isMatched: false });
+             });
+
+            shuffleArray(memoryCards);
+            renderMemoryBoard();
+
+             // Update global progress - game started
+             userProgress.totalGames++;
+             userProgress.lastPlayed = new Date().toISOString();
+             await putData('progress', userProgress);
+        }
+
+        function renderMemoryBoard() {
+            memoryBoardDiv.innerHTML = '';
+            memoryCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('memory-card');
+                if (card.isFlipped) cardElement.classList.add('flipped');
+                if (card.isMatched) cardElement.classList.add('matched');
+                cardElement.dataset.index = index;
+
+                 const cardInner = document.createElement('div');
+                 cardInner.classList.add('card-inner');
+
+                 const cardFront = document.createElement('div');
+                 cardFront.classList.add('card-front'); // This is the back of the physical card
+
+                 const cardBack = document.createElement('div');
+                 cardBack.classList.add('card-back'); // This is the front of the physical card (content)
+                 cardBack.innerHTML = card.type === 'name' ? `<span class="${card.text === card.id.split('-')[1].toUpperCase() ? 'arabic' : 'translation'}">${card.text}</span>` : `<span class="meaning">${card.text}</span>`;
+
+
+                 cardInner.appendChild(cardFront);
+                 cardInner.appendChild(cardBack);
+                 cardElement.appendChild(cardInner);
+
+
+                if (!card.isMatched && !card.isFlipped) {
+                    cardElement.addEventListener('click', handleMemoryCardClick);
+                }
+
+                memoryBoardDiv.appendChild(cardElement);
+            });
+        }
+
+        function handleMemoryCardClick(event) {
+            const clickedCardElement = event.target.closest('.memory-card');
+            if (!clickedCardElement || isBoardLocked || clickedCardElement.classList.contains('flipped') || clickedCardElement.classList.contains('matched')) {
+                return;
+            }
+
+            const index = parseInt(clickedCardElement.dataset.index, 10);
+            const clickedCard = memoryCards[index];
+
+            clickedCard.isFlipped = true;
+            flippedCards.push({ element: clickedCardElement, data: clickedCard, index: index });
+
+            renderMemoryBoard(); // Re-render to show flipped state
+
+            if (flippedCards.length === 2) {
+                isBoardLocked = true;
+                memoryAttempts++;
+                memoryAttemptsSpan.textContent = memoryAttempts;
+
+                const [card1, card2] = flippedCards;
+
+                if (card1.data.id === card2.data.id && card1.data.type !== card2.data.type) {
+                    // Match found!
+                    memoryFeedbackDiv.textContent = 'Match Found!';
+                    memoryFeedbackDiv.className = 'game-feedback feedback-correct';
+
+                    card1.data.isMatched = true;
+                    card2.data.isMatched = true;
+                    matchedPairs++;
+                    memoryPairsSpan.textContent = matchedPairs;
+
+                    // Update SRS (simple: mark as seen/learned)
+                     const nameToUpdate = allNames.find(name => name.id === card1.data.id);
+                     if (nameToUpdate && nameToUpdate.srs.level === 0) {
+                         nameToUpdate.srs.level = 1; // Mark as seen/learning
+                         nameToUpdate.srs.lastReview = new Date().toISOString();
+                         putData('names', nameToUpdate);
+                          const index = allNames.findIndex(n => n.id === nameToUpdate.id);
+                         if (index !== -1) allNames[index] = nameToUpdate;
+                     }
+                     // No progress update needed for memory game currently, just SRS
+
+                    flippedCards = [];
+                    isBoardLocked = false;
+                    renderMemoryBoard(); // Re-render to show matched state
+
+                    if (matchedPairs === memoryCards.length / 2) {
+                        endMemoryGame();
+                    }
+
+                } else {
+                    // No match
+                    memoryFeedbackDiv.textContent = 'No Match. Try again!';
+                    memoryFeedbackDiv.className = 'game-feedback feedback-incorrect';
+
+                    setTimeout(() => {
+                        card1.data.isFlipped = false;
+                        card2.data.isFlipped = false;
+                        flippedCards = [];
+                        isBoardLocked = false;
+                        renderMemoryBoard(); // Re-render to flip back
+                         memoryFeedbackDiv.textContent = ''; // Clear feedback
+                         memoryFeedbackDiv.className = 'game-feedback';
+                    }, 1000); // Flip back after 1 second
+                }
+            }
+        }
+
+        function endMemoryGame() {
+            memoryFeedbackDiv.textContent = `Game Over! You found all ${matchedPairs} pairs in ${memoryAttempts} attempts.`;
+            memoryFeedbackDiv.className = 'game-feedback feedback-correct';
+            memoryStartBtn.classList.remove('hidden');
+        }
+
+
+        // --- Match Game Logic ---
+        let matchPairs = [];
+        let selectedMatchItem = null; // { element: div, data: { id: '...', type: 'arabic'|'translation' } }
+        let matchedMatchPairs = 0;
+        let totalMatchPairs = 0;
+
+        const matchBoardDiv = document.getElementById('match-board');
+        const matchArabicColumn = document.getElementById('match-column-arabic');
+        const matchTranslationColumn = document.getElementById('match-column-translation');
+        const matchPairsSpan = document.getElementById('match-pairs');
+        const matchTotalPairsSpan = document.getElementById('match-total-pairs');
+        const matchFeedbackDiv = document.getElementById('match-feedback');
+        const matchStartBtn = document.getElementById('match-start-btn');
+
+         function resetMatch() {
+            matchPairs = [];
+            selectedMatchItem = null;
+            matchedMatchPairs = 0;
+            totalMatchPairs = 0;
+            matchArabicColumn.innerHTML = '';
+            matchTranslationColumn.innerHTML = '';
+            matchPairsSpan.textContent = '0';
+            matchTotalPairsSpan.textContent = '0';
+            matchFeedbackDiv.textContent = '';
+            matchFeedbackDiv.className = 'game-feedback';
+            matchStartBtn.classList.remove('hidden');
+         }
+
+
+        async function startMatchGame() {
+            resetMatch();
+            matchStartBtn.classList.add('hidden');
+            matchFeedbackDiv.textContent = '';
+
+             // Filter names based on settings (using only enabled languages for translation)
+            const filteredNames = allNames.filter(name => userSettings.quizSets.includes(name.type));
+
+             if (filteredNames.length < 4 || userSettings.quizLanguages.length === 0) {
+                 matchBoardDiv.innerHTML = '<p class="text-center">Not enough names or languages selected in settings to start a match game.</p>';
+                  matchStartBtn.classList.remove('hidden');
+                 return;
+            }
+
+            // Select a subset of names (e.g., 10 names)
+            const namesForGame = shuffleArray(filteredNames).slice(0, 10); // Adjust number
+
+            if (namesForGame.length < 2) { // Need at least 2 names
+                 matchBoardDiv.innerHTML = '<p class="text-center">Not enough unique names available to create match pairs.</p>';
+                  matchStartBtn.classList.remove('hidden');
+                 return;
+            }
+
+            totalMatchPairs = namesForGame.length;
+            matchTotalPairsSpan.textContent = totalMatchPairs;
+
+            // Create match items
+            const arabicItems = namesForGame.map(name => ({ id: name.id, type: 'arabic', text: name.arabic }));
+            const translationItems = namesForGame.map(name => {
+                 const language = shuffleArray([...userSettings.quizLanguages])[0]; // Pick a random enabled language
+                 return { id: name.id, type: 'translation', text: getTranslation(name, language) };
+            });
+
+            shuffleArray(arabicItems);
+            shuffleArray(translationItems);
+
+            renderMatchBoard(arabicItems, translationItems);
+
+             // Update global progress - game started
+             userProgress.totalGames++;
+             userProgress.lastPlayed = new Date().toISOString();
+             await putData('progress', userProgress);
+        }
+
+        function renderMatchBoard(arabicItems, translationItems) {
+            matchArabicColumn.innerHTML = '';
+            matchTranslationColumn.innerHTML = '';
+
+            arabicItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('match-item');
+                itemElement.classList.add('arabic'); // Add arabic class for styling
+                itemElement.textContent = item.text;
+                itemElement.dataset.id = item.id;
+                itemElement.dataset.type = item.type;
+                itemElement.addEventListener('click', handleMatchItemClick);
+                matchArabicColumn.appendChild(itemElement);
+            });
+
+            translationItems.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('match-item');
+                 itemElement.classList.add('translation'); // Add translation class for styling
+                itemElement.textContent = item.text;
+                itemElement.dataset.id = item.id;
+                itemElement.dataset.type = item.type;
+                itemElement.addEventListener('click', handleMatchItemClick);
+                matchTranslationColumn.appendChild(itemElement);
+            });
+        }
+
+        function handleMatchItemClick(event) {
+            const clickedItemElement = event.target.closest('.match-item');
+             if (!clickedItemElement || clickedItemElement.classList.contains('matched')) {
+                 return;
+             }
+
+            if (!selectedMatchItem) {
+                // First item selected
+                selectedMatchItem = {
+                    element: clickedItemElement,
+                    data: {
+                        id: clickedItemElement.dataset.id,
+                        type: clickedItemElement.dataset.type
+                    }
+                };
+                clickedItemElement.classList.add('selected');
+                 matchFeedbackDiv.textContent = 'Select the matching item.';
+                 matchFeedbackDiv.className = 'game-feedback';
+
+            } else {
+                // Second item selected
+                const currentSelectedItem = selectedMatchItem;
+                selectedMatchItem = null; // Reset selection
+
+                clickedItemElement.classList.remove('selected'); // Remove selected class from the clicked one immediately
+
+                // Check if it's the same item clicked again
+                if (clickedItemElement === currentSelectedItem.element) {
+                     currentSelectedItem.element.classList.remove('selected'); // Deselect the first one
+                     matchFeedbackDiv.textContent = ''; // Clear feedback
+                     return;
+                }
+
+                // Check if types are different (arabic vs translation)
+                if (clickedItemElement.dataset.type === currentSelectedItem.data.type) {
+                    // Same type clicked, deselect the first one and select the new one
+                     currentSelectedItem.element.classList.remove('selected');
+                     handleMatchItemClick(event); // Process the new click as the first selection
+                     return;
+                }
+
+
+                // Check for match
+                if (clickedItemElement.dataset.id === currentSelectedItem.data.id) {
+                    // Match found!
+                    matchFeedbackDiv.textContent = 'Match Found!';
+                    matchFeedbackDiv.className = 'game-feedback feedback-correct';
+
+                    clickedItemElement.classList.add('matched');
+                    currentSelectedItem.element.classList.add('matched');
+
+                    matchedMatchPairs++;
+                    matchPairsSpan.textContent = matchedMatchPairs;
+
+                     // Update SRS (simple: mark as seen/learned)
+                     const nameToUpdate = allNames.find(name => name.id === clickedItemElement.dataset.id);
+                     if (nameToUpdate && nameToUpdate.srs.level === 0) {
+                         nameToUpdate.srs.level = 1; // Mark as seen/learning
+                         nameToUpdate.srs.lastReview = new Date().toISOString();
+                         putData('names', nameToUpdate);
+                          const index = allNames.findIndex(n => n.id === nameToUpdate.id);
+                         if (index !== -1) allNames[index] = nameToUpdate;
+                     }
+                    // No progress update needed for match game currently, just SRS
+
+                    if (matchedMatchPairs === totalMatchPairs) {
+                        endMatchGame();
+                    }
+
+                } else {
+                    // No match
+                    matchFeedbackDiv.textContent = 'No Match. Try again!';
+                    matchFeedbackDiv.className = 'game-feedback feedback-incorrect';
+                     // Deselect the first item after a short delay
+                    setTimeout(() => {
+                         currentSelectedItem.element.classList.remove('selected');
+                         matchFeedbackDiv.textContent = ''; // Clear feedback
+                         matchFeedbackDiv.className = 'game-feedback';
+                    }, 500); // Short delay before deselecting
+                }
+            }
+        }
+
+        function endMatchGame() {
+            matchFeedbackDiv.textContent = `Game Over! You matched all ${matchedMatchPairs} pairs.`;
+            matchFeedbackDiv.className = 'game-feedback feedback-correct';
+            matchStartBtn.classList.remove('hidden');
+        }
+
+
+        // --- Event Listeners ---
+        document.getElementById('btn-home').addEventListener('click', () => showSection('section-home'));
+        document.getElementById('btn-list').addEventListener('click', () => showSection('section-list'));
+        document.getElementById('btn-quiz').addEventListener('click', () => showSection('section-quiz'));
+        document.getElementById('btn-memory').addEventListener('click', () => showSection('section-memory'));
+        document.getElementById('btn-match').addEventListener('click', () => showSection('section-match'));
+        document.getElementById('btn-progress').addEventListener('click', () => showSection('section-progress'));
+        document.getElementById('btn-settings').addEventListener('click', () => showSection('section-settings'));
+
+        // Quiz Game Buttons
+        document.getElementById('quiz-start-btn').addEventListener('click', startQuiz);
+        document.getElementById('quiz-next-btn').addEventListener('click', nextQuizQuestion);
+
+        // Memory Game Button
+        document.getElementById('memory-start-btn').addEventListener('click', startMemoryGame);
+
+         // Match Game Button
+        document.getElementById('match-start-btn').addEventListener('click', startMatchGame);
+
+
+        // Settings Button
+        document.getElementById('btn-save-settings').addEventListener('click', saveSettings);
+
+        // Backup/Restore Buttons
+        document.getElementById('btn-backup').addEventListener('click', backupData);
+        document.getElementById('btn-restore').addEventListener('click', () => {
+            document.getElementById('restore-file-input').click(); // Trigger file input click
+        });
+        document.getElementById('restore-file-input').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                restoreData(file);
+            }
+             // Clear the file input so the same file can be selected again
+             event.target.value = '';
+        });
+
+
+        // --- Initialization ---
+        async function initApp() {
+            try {
+                await openDatabase();
+                await initializeData(); // Populate DB if empty, load data into memory
+                await loadInitialDataFromDB(); // Ensure all data is loaded into memory variables
+                applyTheme(userSettings.theme); // Apply saved theme
+                showSection('section-home'); // Start on the home screen
+            } catch (error) {
+                console.error('App initialization failed:', error);
+                document.body.innerHTML = '<p style="color: red; text-align: center;">Failed to initialize the app. Please check your browser settings (e.g., storage permissions) or try again.</p>';
+            }
+        }
+
+        // Run initialization when the DOM is ready
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
